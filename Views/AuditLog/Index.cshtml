@@ -1,0 +1,43 @@
+@model IEnumerable<Website_QuanLyKhoHangThucPham.Models.AuditLog>
+@{ ViewData["Title"] = "Nhật ký hoạt động"; }
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h5 class="fw-bold mb-0">Audit Log</h5><small class="text-muted">@ViewBag.TotalCount bản ghi</small></div>
+</div>
+<div class="sc-card p-3 mb-3">
+  <form method="get" class="d-flex gap-2 flex-wrap">
+    <input name="action" value="@ViewBag.ActionFilter" class="form-control form-control-sm" placeholder="Action (LOGIN, CREATE...)" style="width:180px;"/>
+    <input name="user"   value="@ViewBag.UserFilter"   class="form-control form-control-sm" placeholder="Tên người dùng" style="width:180px;"/>
+    <button type="submit" class="btn btn-sc-outline btn-sm"><i class="fa fa-filter me-1"></i>Lọc</button>
+    <a asp-action="Index" class="btn btn-sc-outline btn-sm">Xóa lọc</a>
+  </form>
+</div>
+<div class="sc-card">
+  <table class="table sc-table mb-0">
+    <thead><tr><th>Thời gian</th><th>Người dùng</th><th>Action</th><th>Đối tượng</th><th>Mô tả</th><th>IP</th><th class="text-end"></th></tr></thead>
+    <tbody>
+    @foreach(var log in Model){
+    { var bc = log.Action switch {
+        var a when a.StartsWith("LOGIN")  => "bg-info",
+        var a when a.StartsWith("CREATE") => "bg-success",
+        var a when a.StartsWith("UPDATE") => "bg-warning text-dark",
+        var a when a.StartsWith("DELETE") || a.StartsWith("CANCEL") || a.StartsWith("REJECT") => "bg-danger",
+        var a when a.StartsWith("CONFIRM") || a.StartsWith("APPROVE") => "bg-primary",
+        _ => "bg-secondary"
+    }; }
+    <tr>
+      <td style="white-space:nowrap;">@log.Timestamp.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+      <td class="fw-semibold">@log.UserName</td>
+      <td><span class="badge bc" style="font-size:.72rem;">@log.Action</span></td>
+      <td class="text-muted" style="font-size:.8rem;">@log.EntityName @log.EntityId</td>
+      <td style="font-size:.8rem;max-width:200px;" class="text-truncate">@log.Description</td>
+      <td class="text-muted" style="font-size:.78rem;">@log.IpAddress</td>
+      <td class="text-end"><a asp-action="Details" asp-route-id="@log.Id" class="btn btn-sm btn-sc-outline"><i class="fa fa-eye"></i></a></td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>
+@{ int tp=(int)Math.Ceiling((double)(int)ViewBag.TotalCount/(int)ViewBag.PageSize); int cp=(int)ViewBag.Page; }
+@if(tp>1){<nav class="mt-3 d-flex justify-content-center"><ul class="pagination pagination-sm">
+  @for(int i=1;i<=tp;i++){<li class="page-item @(i==cp?"active":"")"><a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-action="@ViewBag.ActionFilter" asp-route-user="@ViewBag.UserFilter">@i</a></li>}
+</ul></nav>}

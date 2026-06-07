@@ -1,0 +1,32 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.ProcessExportViewModel
+@{ ViewData["Title"] = "Duyệt yêu cầu xuất kho"; }
+<div class="card">
+<div class="card-header fw-semibold"><i class="fa fa-check-circle me-2 text-success"></i>Duyệt và xuất kho</div>
+<div class="card-body">
+<div class="alert alert-info small"><i class="fa fa-info-circle me-1"></i>Hệ thống sẽ tự động trừ tồn kho theo nguyên tắc <strong>FEFO</strong> (hàng gần hết hạn xuất trước).</div>
+<form asp-action="Process" method="post">
+@Html.AntiForgeryToken()
+<input asp-for="RequestId" type="hidden"/>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Sản phẩm</th><th class="text-end">SL yêu cầu</th><th class="text-end">Tồn kho</th><th style="width:150px">SL xuất thực tế</th></tr></thead>
+<tbody>
+@for(int i=0;i<Model.Items.Count;i++){
+<tr>
+<input asp-for="Items[i].DetailId" type="hidden"/>
+<input asp-for="Items[i].ProductId" type="hidden"/>
+<td class="fw-semibold">@Model.Items[i].ProductName</td>
+<td class="text-end">@Model.Items[i].RequestedQuantity</td>
+<td class="text-end @(Model.Items[i].AvailableStock<Model.Items[i].RequestedQuantity?"text-danger fw-bold":"text-success fw-semibold")">@Model.Items[i].AvailableStock</td>
+<td><input asp-for="Items[i].ActualQuantity" class="form-control form-control-sm text-end" type="number" min="0" max="@Model.Items[i].AvailableStock"/></td>
+</tr>
+}
+</tbody>
+</table>
+</div>
+<div class="mt-3 d-flex gap-2">
+<button type="submit" class="btn btn-success"><i class="fa fa-check me-2"></i>Xác nhận xuất kho</button>
+<a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+</div>
+</form>
+</div></div>

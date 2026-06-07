@@ -1,0 +1,30 @@
+@model IEnumerable<Website_QuanLyKhoHangThucPham.Models.InventoryBatch>
+@{ ViewData["Title"] = "Lô hàng sắp hết hạn"; }
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h4 class="fw-bold mb-0"><i class="fa fa-triangle-exclamation me-2 text-warning"></i>Lô hàng sắp hết hạn (trong 30 ngày)</h4>
+<a asp-action="Index" class="btn btn-outline-secondary btn-sm">Về danh sách nhập</a>
+</div>
+@if(!Model.Any()){<div class="alert alert-success"><i class="fa fa-check me-2"></i>Không có lô hàng nào sắp hết hạn!</div>}
+else{
+<div class="card"><div class="card-body p-0">
+<table class="table table-hover mb-0">
+<thead class="table-light"><tr><th>Mã lô</th><th>Sản phẩm</th><th>Danh mục</th><th class="text-end">Số lượng</th><th>Hạn SD</th><th>Còn lại</th></tr></thead>
+<tbody>
+@foreach(var b in Model.OrderBy(b=>b.DaysUntilExpiry)){
+<tr class="@(b.DaysUntilExpiry<=7?"table-danger":b.DaysUntilExpiry<=14?"table-warning":"")">
+<td><span class="badge bg-light text-dark border">@b.BatchCode</span></td>
+<td class="fw-semibold">@b.Product?.Name</td>
+<td>@b.Product?.Category?.Name</td>
+<td class="text-end">@b.Quantity @b.Product?.Unit</td>
+<td class="fw-semibold">@b.ExpiryDate.ToString("dd/MM/yyyy")</td>
+<td>
+@if(b.DaysUntilExpiry<=7){<span class="badge bg-danger">Còn @b.DaysUntilExpiry ngày!</span>}
+else if(b.DaysUntilExpiry<=14){<span class="badge bg-warning text-dark">Còn @b.DaysUntilExpiry ngày</span>}
+else{<span class="badge bg-info">Còn @b.DaysUntilExpiry ngày</span>}
+</td>
+</tr>
+}
+</tbody>
+</table>
+</div></div>
+}

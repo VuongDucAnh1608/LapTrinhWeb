@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>@ViewData["Title"] — FreshMart</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{--lz-orange:#f57224;--lz-red:#ef4135;--lz-bg:#f5f5f5;--lz-dark:#333;}
+*{box-sizing:border-box;}
+body{background:var(--lz-bg);font-family:'Segoe UI',sans-serif;font-size:14px;color:var(--lz-dark);margin:0;}
+
+/* ── Announcement bar ── */
+.announce-bar{background:var(--lz-red);color:#fff;text-align:center;padding:5px;font-size:.78rem;}
+
+/* ── Header ── */
+.main-header{background:linear-gradient(135deg,var(--lz-orange),#e65100);padding:10px 0;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.header-logo{color:#fff;font-size:1.6rem;font-weight:800;text-decoration:none;letter-spacing:-1px;}
+.header-logo span{color:#ffe082;}
+.search-wrap{flex:1;max-width:600px;margin:0 20px;}
+.search-wrap .input-group{border-radius:4px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.search-wrap input{border:none;font-size:.9rem;padding:10px 16px;}
+.search-wrap input:focus{outline:none;box-shadow:none;}
+.search-wrap .btn-search{background:#fff;border:none;padding:0 18px;color:var(--lz-orange);font-size:1.1rem;}
+.search-wrap .btn-search:hover{background:#ffe082;}
+.header-actions a{color:#fff;text-decoration:none;text-align:center;padding:4px 10px;font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:6px;transition:.15s;}
+.header-actions a:hover{background:rgba(255,255,255,.15);}
+.header-actions a i{font-size:1.1rem;}
+.cart-count-badge{background:#ffe082;color:#c62800;border-radius:10px;padding:1px 6px;font-size:.7rem;font-weight:700;position:absolute;top:-4px;right:-4px;}
+
+/* ── Category nav ── */
+.cat-nav{background:#fff;border-bottom:1px solid #eee;overflow-x:auto;white-space:nowrap;}
+.cat-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;color:#333;text-decoration:none;font-size:.82rem;transition:.15s;border-bottom:2px solid transparent;}
+.cat-nav a:hover,.cat-nav a.active{color:var(--lz-orange);border-bottom-color:var(--lz-orange);}
+.cat-nav a i{color:var(--lz-orange);}
+
+/* ── Hero banner ── */
+.hero-section{background:linear-gradient(135deg,#ff6f00,#e65100);min-height:240px;position:relative;overflow:hidden;display:flex;align-items:center;}
+.hero-bg-circle{position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.06);top:-80px;right:-80px;}
+.hero-bg-circle2{position:absolute;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-60px;left:-40px;}
+.hero-text h2{color:#fff;font-size:2rem;font-weight:800;margin-bottom:8px;}
+.hero-text p{color:rgba(255,255,255,.85);margin-bottom:20px;}
+.hero-badge{background:#ffe082;color:#c62800;border-radius:20px;padding:4px 14px;font-size:.78rem;font-weight:700;display:inline-block;margin-bottom:10px;}
+.hero-img{max-height:200px;filter:drop-shadow(0 8px 20px rgba(0,0,0,.3));}
+
+/* ── Section titles ── */
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--lz-dark);}
+.section-title span{color:var(--lz-orange);}
+.section-title::before{content:'';display:inline-block;width:4px;height:18px;background:var(--lz-orange);border-radius:2px;margin-right:8px;vertical-align:middle;}
+.view-all{color:var(--lz-orange);font-size:.82rem;text-decoration:none;}
+.view-all:hover{text-decoration:underline;}
+
+/* ── Category cards ── */
+.cat-card{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;cursor:pointer;transition:.2s;text-decoration:none;color:var(--lz-dark);}
+.cat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-2px);color:var(--lz-orange);}
+.cat-card .cat-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.4rem;}
+.cat-card .cat-name{font-size:.8rem;font-weight:600;}
+
+/* ── Flash sale ── */
+.flash-header{background:linear-gradient(135deg,var(--lz-red),#c62828);padding:12px 16px;border-radius:10px 10px 0 0;display:flex;align-items:center;gap:12px;}
+.flash-title{color:#fff;font-size:1rem;font-weight:800;letter-spacing:1px;}
+.flash-timer{display:flex;gap:4px;align-items:center;}
+.time-block{background:#fff;color:var(--lz-red);border-radius:4px;padding:3px 8px;font-size:.85rem;font-weight:700;min-width:28px;text-align:center;}
+.time-sep{color:#ffcdd2;font-weight:700;}
+
+/* ── Product card ── */
+.product-card{background:#fff;border-radius:8px;overflow:hidden;transition:.2s;position:relative;height:100%;}
+.product-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);}
+.product-card .p-img{height:180px;object-fit:cover;width:100%;background:#f9f9f9;}
+.product-card .p-body{padding:10px;}
+.product-card .p-name{font-size:.85rem;font-weight:600;line-height:1.3;height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;}
+.product-card .p-price{color:var(--lz-red);font-size:1rem;font-weight:700;}
+.product-card .p-old-price{color:#999;text-decoration:line-through;font-size:.78rem;margin-left:4px;}
+.product-card .p-sold{color:#999;font-size:.72rem;}
+.product-card .p-badge{position:absolute;top:8px;left:8px;background:var(--lz-red);color:#fff;border-radius:3px;padding:2px 6px;font-size:.7rem;font-weight:700;}
+.stars{color:#ffc107;font-size:.75rem;}
+.btn-add-to-cart{background:var(--lz-orange);color:#fff;border:none;border-radius:0 0 8px 8px;width:100%;padding:8px;font-size:.82rem;font-weight:600;transition:.15s;display:none;}
+.product-card:hover .btn-add-to-cart{display:block;}
+.product-card:hover .p-body{border-bottom:none;}
+
+/* ── Promo banners ── */
+.promo-banner{border-radius:10px;overflow:hidden;height:130px;display:flex;align-items:center;padding:20px;color:#fff;position:relative;}
+.promo-banner h6{font-size:1rem;font-weight:700;margin-bottom:4px;}
+.promo-banner p{font-size:.75rem;opacity:.85;margin:0;}
+
+/* ── Breadcrumb ── */
+.lz-breadcrumb{background:#fff;padding:8px 0;margin-bottom:12px;border-bottom:1px solid #eee;}
+.lz-breadcrumb ol{margin:0;padding:0;}
+.lz-breadcrumb .breadcrumb-item+.breadcrumb-item::before{color:#aaa;}
+.lz-breadcrumb a{color:var(--lz-orange);text-decoration:none;}
+
+/* ── Footer ── */
+.main-footer{background:#fff;border-top:1px solid #eee;padding:30px 0 15px;margin-top:30px;}
+.footer-title{font-weight:700;font-size:.88rem;margin-bottom:12px;color:#333;}
+.footer-link{display:block;color:#777;text-decoration:none;font-size:.8rem;padding:3px 0;transition:.15s;}
+.footer-link:hover{color:var(--lz-orange);}
+.footer-bottom{border-top:1px solid #eee;padding-top:12px;margin-top:20px;text-align:center;color:#999;font-size:.76rem;}
+.social-btn{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;margin:2px;}
+
+/* ── Autocomplete ── */
+.ac-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;z-index:2000;max-height:360px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.ac-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid #f5f5f5;display:flex;gap:10px;align-items:center;}
+.ac-item:hover{background:#fff8f5;}
+.ac-item img{width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0;}
+.ac-item .ac-info .ac-name{font-size:.88rem;font-weight:600;}
+.ac-item .ac-info .ac-meta{font-size:.76rem;color:#999;}
+.ac-item .ac-price{color:var(--lz-red);font-weight:700;font-size:.88rem;white-space:nowrap;}
+.ac-locked-hint{padding:8px 16px;font-size:.75rem;color:#aaa;text-align:center;border-top:1px solid #f0f0f0;}
+
+/* ── Misc ── */
+.sticky-header{position:sticky;top:56px;z-index:900;}
+.tag-new{background:#00b96b;color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:700;}
+.tag-hot{background:var(--lz-red);color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:700;}
+</style>
+@await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<!-- Announcement -->
+<div class="announce-bar">🎉 Miễn phí vận chuyển cho đơn hàng từ 200.000 ₫ &nbsp;|&nbsp; Giao hàng nhanh trong ngày 🚀</div>
+
+<!-- Header -->
+<header class="main-header">
+<div class="container">
+<div class="d-flex align-items-center gap-2">
+  <a href="/Store" class="header-logo me-3"><i class="fa fa-leaf"></i><span>Fresh</span>Mart</a>
+
+  <div class="search-wrap">
+    <div class="input-group" id="searchGroup" style="position:relative;">
+      <input type="text" id="globalSearch" class="form-control" placeholder="Tìm thực phẩm, thức uống..." autocomplete="off"/>
+      <button class="btn-search" onclick="submitSearch()"><i class="fa fa-search"></i></button>
+      <div class="ac-dropdown d-none" id="acDrop"></div>
+    </div>
+  </div>
+
+  <div class="header-actions d-flex gap-1 ms-2">
+    @if(User.Identity?.IsAuthenticated==true){
+      <a href="/Home" title="Quản lý">
+        <i class="fa fa-store"></i><span>Quản lý</span>
+      </a>
+      <a href="/Account/Logout" title="Đăng xuất">
+        <i class="fa fa-sign-out-alt"></i><span>Đăng xuất</span>
+      </a>
+    } else {
+      <a href="/Account/Login">
+        <i class="fa fa-user"></i><span>Đăng nhập</span>
+      </a>
+    }
+    <a href="/Store/Cart" style="position:relative;">
+      <i class="fa fa-cart-shopping"></i>
+      <span>Giỏ hàng</span>
+      @if(ViewBag.CartCount != null && (int)ViewBag.CartCount > 0){
+        <span class="cart-count-badge">@ViewBag.CartCount</span>
+      }
+    </a>
+  </div>
+</div>
+</div>
+</header>
+
+<!-- Category Nav Bar -->
+<nav class="cat-nav">
+<div class="container d-flex">
+  <a href="/Store" class="@(ViewContext.RouteData.Values["action"]?.ToString()=="Index"?"active":"")"><i class="fa fa-home"></i>Trang chủ</a>
+  <a href="/Store?categoryId=1"><i class="fa fa-leaf"></i>Rau củ</a>
+  <a href="/Store?categoryId=2"><i class="fa fa-apple-alt"></i>Trái cây</a>
+  <a href="/Store?categoryId=3"><i class="fa fa-drumstick-bite"></i>Thịt & Hải sản</a>
+  <a href="/Store?categoryId=4"><i class="fa fa-cheese"></i>Sữa & Trứng</a>
+  <a href="/Store?categoryId=5"><i class="fa fa-box"></i>Đóng hộp</a>
+  <a href="/Store?categoryId=6"><i class="fa fa-seedling"></i>Ngũ cốc</a>
+  <a href="/Store?categoryId=7"><i class="fa fa-glass-water"></i>Đồ uống</a>
+  <a href="/Store?categoryId=8"><i class="fa fa-pepper-hot"></i>Gia vị</a>
+</div>
+</nav>
+
+@if(TempData["Success"] != null){
+  <div class="container mt-2"><div class="alert alert-success alert-dismissible fade show py-2 small">
+    <i class="fa fa-check-circle me-2"></i>@TempData["Success"]
+    <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+  </div></div>
+}
+@if(TempData["Error"] != null){
+  <div class="container mt-2"><div class="alert alert-danger alert-dismissible fade show py-2 small">
+    <i class="fa fa-exclamation-circle me-2"></i>@TempData["Error"]
+    <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+  </div></div>
+}
+
+<main>@RenderBody()</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+<div class="container">
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="header-logo mb-3" style="font-size:1.4rem;color:var(--lz-orange)"><i class="fa fa-leaf me-1"></i><span style="color:#333;">Fresh</span>Mart</div>
+      <p style="color:#777;font-size:.8rem;line-height:1.6;">Hệ thống quản lý và bán lẻ thực phẩm sạch uy tín. Cam kết cung cấp sản phẩm tươi ngon, nguồn gốc rõ ràng.</p>
+      <div class="mt-2">
+        <a class="social-btn bg-primary me-1" href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        <a class="social-btn" href="#" style="background:#c13584"><i class="fa-brands fa-instagram"></i></a>
+        <a class="social-btn bg-danger" href="#"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="footer-title">HỖ TRỢ</div>
+      <a href="#" class="footer-link">Trung tâm trợ giúp</a>
+      <a href="#" class="footer-link">Chính sách đổi trả</a>
+      <a href="#" class="footer-link">Chính sách bảo mật</a>
+      <a href="#" class="footer-link">Điều khoản dịch vụ</a>
+    </div>
+    <div class="col-md-2">
+      <div class="footer-title">VỀ FRESHMART</div>
+      <a href="#" class="footer-link">Giới thiệu</a>
+      <a href="#" class="footer-link">Tuyển dụng</a>
+      <a href="#" class="footer-link">Liên hệ</a>
+      <a href="#" class="footer-link">Blog sức khỏe</a>
+    </div>
+    <div class="col-md-3">
+      <div class="footer-title">PHƯƠNG THỨC THANH TOÁN</div>
+      <div class="d-flex flex-wrap gap-2 mt-1">
+        <span class="badge border text-dark py-2 px-3"><i class="fa fa-qrcode me-1 text-success"></i>QR Banking</span>
+        <span class="badge border text-dark py-2 px-3"><i class="fa fa-money-bill me-1 text-success"></i>COD</span>
+      </div>
+      <div class="footer-title mt-3">ĐỐI TÁC VẬN CHUYỂN</div>
+      <div class="d-flex gap-2 mt-1">
+        <span class="badge bg-danger py-2 px-3">GHN</span>
+        <span class="badge bg-warning text-dark py-2 px-3">GHTK</span>
+        <span class="badge bg-primary py-2 px-3">ViettelPost</span>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="footer-title">TẢI ỨNG DỤNG</div>
+      <div class="d-flex flex-column gap-2">
+        <a href="#" class="btn btn-dark btn-sm text-start"><i class="fa-brands fa-apple me-2"></i>App Store</a>
+        <a href="#" class="btn btn-dark btn-sm text-start"><i class="fa-brands fa-google-play me-2"></i>Google Play</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2025 FreshMart — Hệ thống Quản lý Kho Hàng Thực Phẩm &nbsp;|&nbsp;
+    MSSV: 2380600093 — Vương Đoàn Đức Anh
+  </div>
+</div>
+</footer>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="lzToast" class="toast align-items-center text-white border-0" role="alert">
+    <div class="d-flex"><div class="toast-body fw-semibold" id="lzToastMsg"></div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+  </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── Global toast ───────────────────────────────────────────────────────────
+const lzToastEl = document.getElementById('lzToast');
+const lzToastBS = bootstrap.Toast ? new bootstrap.Toast(lzToastEl) : null;
+function showToast(msg, ok=true) {
+  document.getElementById('lzToastMsg').textContent = msg;
+  lzToastEl.className = `toast align-items-center text-white border-0 ${ok?'bg-success':'bg-danger'}`;
+  lzToastBS?.show();
+}
+
+// ── Add to cart (global, dùng mọi nơi) ────────────────────────────────────
+async function addToCart(productId, qty=1) {
+  const token = document.querySelector('[name=__RequestVerificationToken]')?.value || '';
+  const res = await fetch('/Store/AddToCart', {
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:`productId=${productId}&quantity=${qty}&__RequestVerificationToken=${encodeURIComponent(token)}`
+  });
+  const d = await res.json();
+  showToast(d.message, d.success);
+  if(d.success) {
+    document.querySelectorAll('.cart-count-badge').forEach(b => b.textContent=d.totalItems);
+    if(!document.querySelector('.cart-count-badge') && d.totalItems>0) {
+      document.querySelector('[href="/Store/Cart"]')?.insertAdjacentHTML('beforeend',
+        `<span class="cart-count-badge">${d.totalItems}</span>`);
+    }
+  }
+  return d;
+}
+
+// ── Autocomplete với debounce ─────────────────────────────────────────────
+let acTimer;
+const acInput = document.getElementById('globalSearch');
+const acDrop  = document.getElementById('acDrop');
+const isLoggedIn = @(User.Identity?.IsAuthenticated==true ? "true" : "false");
+
+if(acInput) {
+  acInput.addEventListener('input', function() {
+    clearTimeout(acTimer);
+    const term = this.value.trim();
+    if(term.length < 1){ acDrop.classList.add('d-none'); return; }
+    acTimer = setTimeout(async () => {
+      const res  = await fetch(`/Store/Autocomplete?term=${encodeURIComponent(term)}`);
+      const data = await res.json();
+      if(!data.length){ acDrop.classList.add('d-none'); return; }
+      acDrop.innerHTML = data.map(p=>`
+        <div class="ac-item" onclick="location.href='/Store/ProductDetail/${p.id}'">
+          <div class="ac-info flex-grow-1">
+            <div class="ac-name">${p.label}</div>
+            <div class="ac-meta">${p.category} · ${p.unit}
+              ${isLoggedIn&&p.stock!==undefined?`<span class="badge bg-light text-secondary border ms-1">Còn: ${p.stock}</span>`:''}
+            </div>
+          </div>
+          <div class="ac-price">${Number(p.price).toLocaleString('vi-VN')} ₫</div>
+        </div>`).join('') +
+        (!isLoggedIn?`<div class="ac-locked-hint"><i class="fa fa-lock fa-xs me-1"></i>Đăng nhập để xem thêm thông tin tồn kho</div>`:'');
+      acDrop.classList.remove('d-none');
+    }, 300);
+  });
+  acInput.addEventListener('keydown', e => { if(e.key==='Enter') submitSearch(); });
+}
+
+function submitSearch() {
+  const q = acInput?.value.trim();
+  if(q) window.location.href = `/Store?search=${encodeURIComponent(q)}`;
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('#searchGroup')) acDrop?.classList.add('d-none');
+});
+</script>
+@Html.AntiForgeryToken()
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

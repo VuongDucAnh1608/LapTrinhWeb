@@ -1,0 +1,174 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.CheckoutViewModel
+@{ ViewData["Title"] = "Đặt hàng"; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container my-3">
+<!-- Steps -->
+<div class="d-flex align-items-center gap-2 mb-4 justify-content-center" style="font-size:.82rem;">
+  <div class="d-flex align-items-center gap-1">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--lz-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;">1</div>
+    <span style="color:var(--lz-orange);font-weight:600;">Giỏ hàng</span>
+  </div>
+  <div style="flex:1;height:2px;background:var(--lz-orange);max-width:80px;"></div>
+  <div class="d-flex align-items-center gap-1">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--lz-red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;">2</div>
+    <span style="color:var(--lz-red);font-weight:600;">Đặt hàng</span>
+  </div>
+  <div style="flex:1;height:2px;background:#ddd;max-width:80px;"></div>
+  <div class="d-flex align-items-center gap-1">
+    <div style="width:28px;height:28px;border-radius:50%;background:#ddd;color:#aaa;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;">3</div>
+    <span style="color:#aaa;">Thanh toán</span>
+  </div>
+</div>
+
+<form asp-controller="Payment" asp-action="PlaceOrder" method="post">
+@Html.AntiForgeryToken()
+<div class="row g-3">
+
+  <!-- Left: Address + Payment -->
+  <div class="col-lg-7">
+
+    <!-- Delivery address -->
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);padding:20px;margin-bottom:12px;">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="fa fa-location-dot" style="color:var(--lz-red);"></i>
+        <h6 class="fw-bold mb-0">Thông tin nhận hàng</h6>
+      </div>
+      <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-size:.8rem;font-weight:600;color:#555;">Họ và tên <span class="text-danger">*</span></label>
+          <input asp-for="CustomerName" class="form-control form-control-sm" placeholder="Nguyễn Văn A"/>
+          <span asp-validation-for="CustomerName" class="text-danger" style="font-size:.75rem;"></span>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-size:.8rem;font-weight:600;color:#555;">Số điện thoại <span class="text-danger">*</span></label>
+          <input asp-for="CustomerPhone" class="form-control form-control-sm" placeholder="0901 234 567"/>
+          <span asp-validation-for="CustomerPhone" class="text-danger" style="font-size:.75rem;"></span>
+        </div>
+        <div class="col-12">
+          <label class="form-label" style="font-size:.8rem;font-weight:600;color:#555;">Email <span class="text-danger">*</span></label>
+          <input asp-for="CustomerEmail" class="form-control form-control-sm" placeholder="email@example.com"/>
+          <span asp-validation-for="CustomerEmail" class="text-danger" style="font-size:.75rem;"></span>
+        </div>
+        <div class="col-12">
+          <label class="form-label" style="font-size:.8rem;font-weight:600;color:#555;">Địa chỉ giao hàng</label>
+          <input asp-for="DeliveryAddress" class="form-control form-control-sm" placeholder="Số nhà, đường, phường, quận, thành phố"/>
+        </div>
+        <div class="col-12">
+          <label class="form-label" style="font-size:.8rem;font-weight:600;color:#555;">Ghi chú</label>
+          <textarea asp-for="Note" class="form-control form-control-sm" rows="2" placeholder="Giao hàng giờ hành chính, gọi trước khi giao..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment method -->
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);padding:20px;">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="fa fa-credit-card" style="color:var(--lz-orange);"></i>
+        <h6 class="fw-bold mb-0">Phương thức thanh toán</h6>
+      </div>
+      <div class="d-flex flex-column gap-2">
+        <!-- SePay option -->
+        <label id="opt-sepay" onclick="selectPay('SePay')"
+          style="border:2px solid var(--lz-orange);border-radius:10px;padding:14px;cursor:pointer;background:#fff8f5;transition:.2s;">
+          <input type="radio" name="PaymentMethod" value="SePay" checked class="d-none"/>
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#43a047,#1b5e20);display:flex;align-items:center;justify-content:center;">
+              <i class="fa fa-qrcode fa-lg text-white"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="fw-bold" style="font-size:.9rem;">Chuyển khoản qua QR Code</div>
+              <div style="font-size:.78rem;color:#777;">Quét mã QR — Xác nhận tự động qua SePay</div>
+            </div>
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--lz-orange);background:var(--lz-orange);display:flex;align-items:center;justify-content:center;" id="dot-sepay">
+              <i class="fa fa-check text-white" style="font-size:.6rem;"></i>
+            </div>
+          </div>
+        </label>
+
+        <!-- COD option -->
+        <label id="opt-cod" onclick="selectPay('COD')"
+          style="border:2px solid #eee;border-radius:10px;padding:14px;cursor:pointer;transition:.2s;">
+          <input type="radio" name="PaymentMethod" value="COD" class="d-none"/>
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#f57c00,#e65100);display:flex;align-items:center;justify-content:center;">
+              <i class="fa fa-money-bill fa-lg text-white"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="fw-bold" style="font-size:.9rem;">Thanh toán khi nhận hàng (COD)</div>
+              <div style="font-size:.78rem;color:#777;">Trả tiền mặt cho shipper khi nhận hàng</div>
+            </div>
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid #ddd;" id="dot-cod"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Order summary -->
+  <div class="col-lg-5">
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);padding:20px;position:sticky;top:100px;">
+      <h6 class="fw-bold mb-3" style="border-bottom:1px solid #f0f0f0;padding-bottom:10px;">
+        <i class="fa fa-bag-shopping me-2" style="color:var(--lz-orange);"></i>Đơn hàng (@Model.Items.Count sản phẩm)
+      </h6>
+      @foreach(var item in Model.Items){
+      <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom" style="border-color:#f5f5f5!important;">
+        <img src="@(item.ImageUrl??"/images/no-image.png")" onerror="this.src='/images/no-image.png'"
+             style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;"/>
+        <div style="flex:1;min-width:0;">
+          <div class="text-truncate" style="font-size:.83rem;font-weight:600;">@item.ProductName</div>
+          <div style="font-size:.75rem;color:#888;">x@item.Quantity @item.Unit</div>
+        </div>
+        <div style="color:var(--lz-red);font-weight:700;font-size:.88rem;white-space:nowrap;">@item.SubTotal.ToString("N0") ₫</div>
+      </div>
+      }
+      <div class="d-flex justify-content-between mt-2" style="font-size:.85rem;">
+        <span style="color:#777;">Tạm tính</span><span>@Model.Total.ToString("N0") ₫</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2" style="font-size:.85rem;">
+        <span style="color:#777;">Phí ship</span>
+        @if(Model.Total >= 200000){<span class="text-success fw-semibold">Miễn phí</span>}
+        else{<span>30.000 ₫</span>}
+      </div>
+      <div style="border-top:2px dashed #eee;padding-top:12px;margin:10px 0;">
+        <div class="d-flex justify-content-between">
+          <span class="fw-bold fs-6">Tổng thanh toán</span>
+          <span class="fw-bold fs-5" style="color:var(--lz-red);">
+            @((Model.Total + (Model.Total < 200000 ? 30000 : 0)).ToString("N0")) ₫
+          </span>
+        </div>
+      </div>
+      <button type="submit" class="btn w-100 fw-bold py-2 mt-2"
+              style="background:linear-gradient(135deg,var(--lz-red),#c62828);color:#fff;border-radius:10px;font-size:.95rem;">
+        <i class="fa fa-check-circle me-2"></i>Xác nhận đặt hàng
+      </button>
+      <a href="/Store/Cart" class="btn w-100 btn-outline-secondary btn-sm mt-2">
+        <i class="fa fa-arrow-left me-1"></i>Quay lại giỏ hàng
+      </a>
+      <div class="text-center mt-3" style="font-size:.72rem;color:#bbb;">
+        <i class="fa fa-shield-halved me-1 text-success"></i>Thông tin của bạn được bảo mật 100%
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+</div>
+
+@section Scripts {
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script>
+function selectPay(val) {
+  const isSepay = val === 'SePay';
+  document.getElementById('opt-sepay').style.border = isSepay ? '2px solid var(--lz-orange)' : '2px solid #eee';
+  document.getElementById('opt-sepay').style.background = isSepay ? '#fff8f5' : '#fff';
+  document.getElementById('dot-sepay').style.background = isSepay ? 'var(--lz-orange)' : '#fff';
+  document.getElementById('dot-sepay').innerHTML = isSepay ? '<i class="fa fa-check text-white" style="font-size:.6rem;"></i>' : '';
+  document.getElementById('opt-cod').style.border = !isSepay ? '2px solid var(--lz-orange)' : '2px solid #eee';
+  document.getElementById('opt-cod').style.background = !isSepay ? '#fff8f5' : '#fff';
+  document.getElementById('dot-cod').style.background = !isSepay ? 'var(--lz-orange)' : '#fff';
+  document.getElementById('dot-cod').innerHTML = !isSepay ? '<i class="fa fa-check text-white" style="font-size:.6rem;"></i>' : '';
+  document.querySelectorAll('[name=PaymentMethod]').forEach(r => r.checked = (r.value === val));
+}
+</script>
+}

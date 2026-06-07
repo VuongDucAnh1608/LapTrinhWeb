@@ -1,0 +1,190 @@
+@model Website_QuanLyKhoHangThucPham.Models.Product
+@{ ViewData["Title"] = Model.Name; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container my-3">
+<!-- Breadcrumb -->
+<nav class="lz-breadcrumb mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/Store">Trang chủ</a></li>
+    <li class="breadcrumb-item"><a href="/Store?categoryId=@Model.CategoryId">@Model.Category?.Name</a></li>
+    <li class="breadcrumb-item active text-truncate" style="max-width:200px;">@Model.Name</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <!-- Image -->
+  <div class="col-md-4">
+    <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.08);">
+      <img id="mainImg" src="@(Model.ImageUrl??"/images/no-image.png")"
+           onerror="this.src='/images/no-image.png'"
+           style="width:100%;height:320px;object-fit:contain;border-radius:8px;" alt="@Model.Name"/>
+      <!-- Thumbnail row (same image × 3 as placeholder) -->
+      <div class="d-flex gap-2 mt-3 justify-content-center">
+        @for(int i=0;i<3;i++){
+        <img src="@(Model.ImageUrl??"/images/no-image.png")" onerror="this.src='/images/no-image.png'"
+             style="width:64px;height:64px;object-fit:cover;border-radius:6px;border:2px solid @(i==0?"var(--lz-orange)":"#eee");cursor:pointer;"
+             onclick="document.getElementById('mainImg').src=this.src"/>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="col-md-5">
+    <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.08);height:100%;">
+      <div class="d-flex gap-2 mb-2">
+        <span class="tag-new">MỚI</span>
+        <span style="background:#fff3e0;color:#e65100;border-radius:3px;padding:1px 6px;font-size:.7rem;font-weight:700;">CHÍNH HÃNG</span>
+      </div>
+      <h4 class="fw-bold mb-2">@Model.Name</h4>
+
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stars" style="font-size:.9rem;">★★★★☆</div>
+        <span style="color:#999;font-size:.8rem;">4.2 (128 đánh giá)</span>
+        <span style="color:#999;font-size:.8rem;">|</span>
+        <span style="color:#999;font-size:.8rem;">Đã bán 320+</span>
+      </div>
+
+      <div style="background:#fff8f5;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:1.8rem;font-weight:800;color:var(--lz-red);">
+          @Model.SellPrice.ToString("N0") ₫
+          <span style="font-size:1rem;color:#999;text-decoration:line-through;font-weight:400;margin-left:8px;">@Model.CostPrice.ToString("N0") ₫</span>
+        </div>
+        @{ var disc = (int)(((Model.CostPrice / Model.SellPrice) - 1) * -100); }
+        @if(disc > 0){
+          <span style="background:var(--lz-red);color:#fff;border-radius:4px;padding:2px 8px;font-size:.78rem;font-weight:700;">TIẾT KIỆM @disc%</span>
+        }
+      </div>
+
+      <!-- Specs -->
+      <table class="table table-sm" style="font-size:.85rem;">
+        <tr><td style="width:40%;color:#888;">Danh mục</td><td class="fw-semibold">@Model.Category?.Name</td></tr>
+        <tr><td style="color:#888;">Nhà cung cấp</td><td class="fw-semibold">@Model.Supplier?.Name</td></tr>
+        <tr><td style="color:#888;">Đơn vị</td><td class="fw-semibold">@Model.Unit</td></tr>
+        <tr><td style="color:#888;">SKU</td><td><code>@Model.SKU</code></td></tr>
+        <tr>
+          <td style="color:#888;">Tình trạng</td>
+          <td>
+            @if(Model.TotalStock > 0){
+              <span style="color:#43a047;font-weight:600;"><i class="fa fa-circle-check me-1"></i>Còn hàng (@Model.TotalStock @Model.Unit)</span>
+            } else {
+              <span style="color:#e53935;font-weight:600;"><i class="fa fa-circle-xmark me-1"></i>Hết hàng</span>
+            }
+          </td>
+        </tr>
+      </table>
+
+      @if(!string.IsNullOrEmpty(Model.Description)){
+        <p style="font-size:.85rem;color:#555;line-height:1.6;">@Model.Description</p>
+      }
+    </div>
+  </div>
+
+  <!-- Cart panel -->
+  <div class="col-md-3">
+    <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.08);position:sticky;top:100px;">
+      <div style="font-size:.88rem;color:#888;margin-bottom:8px;">Vận chuyển:</div>
+      <div style="font-size:.85rem;margin-bottom:12px;display:flex;gap:8px;align-items:center;">
+        <i class="fa fa-truck text-success"></i>
+        <span>Giao hàng <strong class="text-success">nhanh 2 giờ</strong></span>
+      </div>
+      <div style="border-top:1px dashed #eee;padding-top:12px;margin-bottom:12px;">
+        <div style="font-size:.88rem;color:#888;margin-bottom:6px;">Số lượng:</div>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <button onclick="changeQty(-1)" class="btn btn-sm btn-outline-secondary px-3" id="btnMinus">−</button>
+          <input type="number" id="qty" value="1" min="1" max="@Model.TotalStock"
+                 class="form-control form-control-sm text-center" style="width:60px;"/>
+          <button onclick="changeQty(1)" class="btn btn-sm btn-outline-secondary px-3">+</button>
+        </div>
+      </div>
+      @if(Model.TotalStock > 0){
+      <button class="btn w-100 mb-2 fw-semibold"
+        style="background:var(--lz-orange);color:#fff;border-radius:8px;padding:10px;"
+        onclick="addToCart(@Model.Id, parseInt(document.getElementById('qty').value))">
+        <i class="fa fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+      </button>
+      <button class="btn w-100 fw-semibold"
+        style="background:var(--lz-red);color:#fff;border-radius:8px;padding:10px;"
+        onclick="buyNow(@Model.Id)">
+        <i class="fa fa-bolt me-2"></i>Mua ngay
+      </button>
+      } else {
+        <button class="btn w-100 btn-secondary" disabled>Hết hàng</button>
+      }
+      <div class="d-flex justify-content-around mt-3" style="font-size:.75rem;color:#888;">
+        <span><i class="fa fa-shield-halved me-1 text-success"></i>Hàng chính hãng</span>
+        <span><i class="fa fa-rotate-left me-1 text-primary"></i>Đổi trả 7 ngày</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Description tabs -->
+<div class="mt-4" style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.08);">
+  <ul class="nav nav-tabs px-3 pt-3" id="pdTabs">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#desc">Mô tả sản phẩm</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#review">Đánh giá (128)</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#shipping">Vận chuyển</a></li>
+  </ul>
+  <div class="tab-content p-4">
+    <div class="tab-pane active" id="desc">
+      <p>@(Model.Description ?? "Sản phẩm chất lượng cao, nguồn gốc rõ ràng. Đảm bảo vệ sinh an toàn thực phẩm theo tiêu chuẩn Bộ Y tế.")</p>
+      <ul style="font-size:.9rem;color:#555;">
+        <li>Xuất xứ: Việt Nam</li>
+        <li>Tiêu chuẩn: VietGAP / GlobalGAP</li>
+        <li>Bảo quản: @(Model.CategoryId <= 3 ? "2–8°C (ngăn mát tủ lạnh)" : "Nơi khô ráo, thoáng mát")</li>
+      </ul>
+    </div>
+    <div class="tab-pane" id="review">
+      @for(int i=0;i<3;i++){
+      <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--lz-orange);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0;">
+          @("ABCDE"[i])
+        </div>
+        <div>
+          <div class="fw-semibold" style="font-size:.88rem;">Khách hàng @(i+1)</div>
+          <div class="stars">★★★★@(i==2?"☆":"★")</div>
+          <div style="font-size:.85rem;color:#555;margin-top:4px;">Sản phẩm tươi ngon, giao hàng nhanh, đóng gói cẩn thận. Sẽ ủng hộ thêm!</div>
+          <div style="font-size:.75rem;color:#aaa;">@DateTime.Now.AddDays(-i*3).ToString("dd/MM/yyyy")</div>
+        </div>
+      </div>
+      }
+    </div>
+    <div class="tab-pane" id="shipping">
+      <div class="row g-3" style="font-size:.88rem;">
+        <div class="col-md-4 text-center p-3" style="border-right:1px solid #eee;">
+          <i class="fa fa-truck fa-2x text-success mb-2"></i>
+          <div class="fw-bold">Giao hàng nhanh</div>
+          <div class="text-muted">Giao trong 2h trong bán kính 10km</div>
+        </div>
+        <div class="col-md-4 text-center p-3" style="border-right:1px solid #eee;">
+          <i class="fa fa-clock fa-2x text-primary mb-2"></i>
+          <div class="fw-bold">Giao hàng tiêu chuẩn</div>
+          <div class="text-muted">1–3 ngày toàn quốc</div>
+        </div>
+        <div class="col-md-4 text-center p-3">
+          <i class="fa fa-hand-holding-dollar fa-2x text-warning mb-2"></i>
+          <div class="fw-bold">Miễn phí từ 200k</div>
+          <div class="text-muted">Đơn hàng trên 200.000 ₫</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+@section Scripts {
+<script>
+function changeQty(delta) {
+  const inp = document.getElementById('qty');
+  const max = @Model.TotalStock;
+  inp.value = Math.max(1, Math.min(max, parseInt(inp.value||1) + delta));
+}
+
+async function buyNow(pid) {
+  const qty = parseInt(document.getElementById('qty').value);
+  const d = await addToCart(pid, qty);
+  if(d.success) window.location.href = '/Store/Cart';
+}
+</script>
+}

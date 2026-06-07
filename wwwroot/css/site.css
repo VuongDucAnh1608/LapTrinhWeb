@@ -1,0 +1,14 @@
+html{font-size:14px;}
+body{font-family:'Segoe UI',sans-serif;}
+.table th{font-weight:600;font-size:.82rem;color:#495057;}
+.table td{font-size:.875rem;vertical-align:middle;}
+.btn{border-radius:6px;font-size:.875rem;}
+.btn-sm{padding:4px 10px;font-size:.8rem;}
+.card{border-radius:10px;}
+.card-header{background:#fff;border-bottom:1px solid #edf2f7;padding:14px 18px;font-size:.92rem;}
+.alert{border-radius:8px;font-size:.875rem;}
+.badge{font-weight:500;border-radius:5px;}
+.form-control,.form-select{border-radius:7px;font-size:.875rem;border-color:#d4dbe2;}
+.form-control:focus,.form-select:focus{border-color:#4fc3f7;box-shadow:0 0 0 3px rgba(79,195,247,.15);}
+.form-label{font-size:.85rem;margin-bottom:4px;}
+.page-link{border-radius:5px!important;margin:0 2px;}

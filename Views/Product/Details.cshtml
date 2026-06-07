@@ -1,0 +1,59 @@
+@model Website_QuanLyKhoHangThucPham.Models.Product
+@{ ViewData["Title"] = "Chi tiết: " + Model.Name; }
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="fw-bold mb-0">Chi tiết sản phẩm</h5>
+  <div class="d-flex gap-2">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sc-primary btn-sm"><i class="fa fa-pen me-1"></i>Chỉnh sửa</a>
+    <a asp-action="Index" class="btn btn-sc-outline btn-sm"><i class="fa fa-arrow-left me-1"></i>Quay lại</a>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="sc-card p-3 text-center">
+      <img src="@(Model.ImageUrl??"/images/no-image.png")" onerror="this.src='/images/no-image.png'"
+           style="width:100%;max-height:220px;object-fit:contain;border-radius:8px;"/>
+      @if(Model.IsLowStock){<div class="badge bg-danger mt-2 d-block py-2"><i class="fa fa-fire me-1"></i>Tồn kho thấp!</div>}
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="sc-card p-4">
+      <h5 class="fw-bold mb-3">@Model.Name</h5>
+      <div class="row g-3">
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">SKU</div><code>@Model.SKU</code></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Danh mục</div><span class="badge bg-light text-dark border">@Model.Category?.Name</span></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Nhà cung cấp</div><div class="fw-semibold">@Model.Supplier?.Name</div></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Đơn vị</div><div class="fw-semibold">@Model.Unit</div></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Giá nhập</div><div class="fw-semibold">@Model.CostPrice.ToString("N0") ₫</div></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Giá bán</div><div class="fw-bold" style="color:var(--sc-orange);">@Model.SellPrice.ToString("N0") ₫</div></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Tổng tồn kho</div>
+          <div class="fw-bold fs-5 @(Model.IsLowStock?"text-danger":"text-success")">@Model.TotalStock @Model.Unit</div></div>
+        <div class="col-md-3"><div class="text-muted" style="font-size:.78rem;">Tồn kho tối thiểu</div><div class="fw-semibold">@Model.MinStockLevel @Model.Unit</div></div>
+        @if(!string.IsNullOrEmpty(Model.Description)){
+        <div class="col-12"><div class="text-muted" style="font-size:.78rem;">Mô tả</div><p class="text-muted mb-0">@Model.Description</p></div>}
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="sc-card">
+      <div class="card-header"><i class="fa fa-layer-group me-2" style="color:var(--sc-orange);"></i>Các lô hàng trong kho</div>
+      <table class="table sc-table mb-0">
+        <thead><tr><th>Mã lô</th><th>Ngày nhập</th><th>Ngày SX</th><th>Hạn SD</th><th class="text-center">Số lượng</th><th>Tình trạng</th></tr></thead>
+        <tbody>
+        @foreach(var b in Model.Batches.OrderBy(b=>b.ExpiryDate)){
+        <tr class="@(b.IsExpired?"table-secondary":b.IsExpiringSoon?"table-warning":"")">
+          <td><code style="font-size:.78rem;">@b.BatchCode</code></td>
+          <td>@b.ReceivedDate.ToLocalTime().ToString("dd/MM/yyyy")</td>
+          <td>@b.ManufactureDate.ToString("dd/MM/yyyy")</td>
+          <td class="fw-semibold @(b.IsExpiringSoon?"text-warning":b.IsExpired?"text-muted":"")">@b.ExpiryDate.ToString("dd/MM/yyyy")</td>
+          <td class="text-center"><span class="badge @(b.Quantity==0?"bg-secondary":b.Quantity<10?"bg-warning text-dark":"bg-success")">@b.Quantity</span></td>
+          <td>
+            @if(b.IsExpired){<span class="badge bg-secondary">Hết hạn</span>}
+            else if(b.IsExpiringSoon){<span class="badge bg-warning text-dark">Còn @b.DaysUntilExpiry ngày</span>}
+            else{<span class="badge bg-success">Còn hạn</span>}
+          </td>
+        </tr>}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

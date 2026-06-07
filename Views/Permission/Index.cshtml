@@ -1,0 +1,109 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.PermissionMatrixViewModel
+@{ ViewData["Title"] = "Phan quyen dong"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+<div>
+    <h4 class="fw-bold mb-1"><i class="fa fa-shield-halved me-2 text-primary"></i>Phan quyen dong</h4>
+    <p class="text-muted small mb-0">Thay doi co hieu luc <strong>ngay lap tuc</strong> (cache 5 phut). Admin luon co tat ca quyen.</p>
+</div>
+</div>
+
+@foreach(var role in Model.Roles.Where(r => r != "Admin"))
+{
+    var currentPerms = Model.RolePermMap.TryGetValue(role, out var ids) ? ids : new List<int>();
+    var roleColor = role == "WarehouseStaff" ? "primary" : "warning";
+    <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <span class="badge bg-@roleColor me-2 fs-6">@role</span>
+            <span class="text-muted small">@currentPerms.Count / @Model.Permissions.Count quyen dang bat</span>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary" type="button"
+            data-bs-toggle="collapse" data-bs-target="#role-@role">
+            <i class="fa fa-pen me-1"></i>Chinh sua
+        </button>
+    </div>
+
+    <div class="collapse" id="role-@role">
+    <div class="card-body">
+    <form asp-action="SaveRolePermissions" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="roleName" value="@role"/>
+
+    @foreach(var group in Model.Permissions.GroupBy(p => p.Controller).OrderBy(g => g.Key))
+    {
+        <div class="mb-3">
+            <div class="fw-semibold text-secondary small mb-2 text-uppercase" style="letter-spacing:.06em">
+                <i class="fa fa-cube me-1"></i>@group.Key
+            </div>
+            <div class="row g-2">
+            @foreach(var perm in group)
+            {
+                var isChecked = currentPerms.Contains(perm.Id);
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="form-check form-switch p-0">
+                        <label class="d-flex align-items-center gap-2 p-2 rounded border @(isChecked?"border-success bg-success bg-opacity-10":"") cursor-pointer"
+                               style="cursor:pointer;" title="@perm.PermissionKey">
+                            <input class="form-check-input ms-0" type="checkbox"
+                                   name="permissionIds" value="@perm.Id"
+                                   @(isChecked ? "checked" : "")/>
+                            <span class="small fw-semibold">@perm.DisplayName</span>
+                        </label>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    }
+
+    <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-success btn-sm px-4">
+            <i class="fa fa-save me-2"></i>Luu quyen cho @role
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+            onclick="toggleAll('@role', true)">Chon tat ca</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+            onclick="toggleAll('@role', false)">Bo chon tat ca</button>
+    </div>
+    </form>
+    </div></div></div>
+}
+
+<div class="card border-success">
+<div class="card-header bg-success text-white fw-semibold">
+    <i class="fa fa-crown me-2"></i>Admin — Toan quyen (khong chinh sua duoc)
+</div>
+<div class="card-body">
+    <div class="row g-1">
+    @foreach(var p in Model.Permissions){
+    <div class="col-sm-6 col-md-4 col-lg-3">
+        <span class="badge bg-success bg-opacity-10 text-success border border-success py-1 px-2 small">
+            <i class="fa fa-check me-1"></i>@p.DisplayName
+        </span>
+    </div>}
+    </div>
+</div></div>
+
+@section Scripts {
+<script>
+function toggleAll(role, check) {
+    const form = document.querySelector(`#role-${role} form`);
+    form.querySelectorAll('[type=checkbox]').forEach(cb => {
+        cb.checked = check;
+        cb.closest('label').className = cb.closest('label').className
+            .replace('border-success bg-success bg-opacity-10', '')
+            .trim();
+        if(check) cb.closest('label').classList.add('border-success','bg-success','bg-opacity-10');
+    });
+}
+// Live toggle highlight
+document.querySelectorAll('[name=permissionIds]').forEach(cb => {
+    cb.addEventListener('change', function() {
+        const lbl = this.closest('label');
+        lbl.classList.toggle('border-success', this.checked);
+        lbl.classList.toggle('bg-success',     this.checked);
+        lbl.classList.toggle('bg-opacity-10',  this.checked);
+    });
+});
+</script>
+}

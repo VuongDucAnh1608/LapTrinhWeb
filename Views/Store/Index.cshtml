@@ -1,0 +1,301 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.PagedResult<Website_QuanLyKhoHangThucPham.Models.Product>
+@{ ViewData["Title"] = "FreshMart — Siêu thị thực phẩm sạch"; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container-fluid px-0">
+
+  <!-- Hero Banner -->
+  <div class="hero-section px-4">
+    <div class="hero-bg-circle"></div><div class="hero-bg-circle2"></div>
+    <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6 hero-text">
+        <div class="hero-badge">🎉 ƯU ĐÃI HÔM NAY</div>
+        <h2>Thực phẩm sạch<br/>giao tận cửa</h2>
+        <p>Rau củ, trái cây, thịt cá tươi ngon<br/>nguồn gốc rõ ràng — giá tốt mỗi ngày</p>
+        <a href="/Store?categoryId=" class="btn btn-light fw-bold px-4 py-2 me-2" style="color:var(--lz-orange);">
+          <i class="fa fa-store me-2"></i>Mua ngay
+        </a>
+        <a href="/Store/Cart" class="btn btn-outline-light px-4 py-2">
+          <i class="fa fa-cart-shopping me-2"></i>Giỏ hàng
+        </a>
+      </div>
+      <div class="col-md-6 text-center d-none d-md-block">
+        <div class="row g-2 mt-2">
+          <div class="col-4">
+            <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:16px;text-align:center;color:#fff;">
+              <div style="font-size:1.8rem;font-weight:800;">18+</div>
+              <div style="font-size:.72rem;opacity:.85;">Sản phẩm</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:16px;text-align:center;color:#fff;">
+              <div style="font-size:1.8rem;font-weight:800;">5★</div>
+              <div style="font-size:.72rem;opacity:.85;">Chất lượng</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:16px;text-align:center;color:#fff;">
+              <div style="font-size:1.8rem;font-weight:800;">2h</div>
+              <div style="font-size:.72rem;opacity:.85;">Giao hàng</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Promo row -->
+  <div class="container my-3">
+  <div class="row g-2">
+    <div class="col-md-4">
+      <div class="promo-banner" style="background:linear-gradient(135deg,#43a047,#1b5e20);">
+        <div><h6>🥦 Rau củ tươi mỗi sáng</h6><p>Nhập thẳng từ nông trại</p>
+        <a href="/Store?categoryId=1" class="btn btn-light btn-sm mt-1">Xem ngay</a></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="promo-banner" style="background:linear-gradient(135deg,#1565c0,#0d47a1);">
+        <div><h6>🐟 Hải sản tươi sống</h6><p>Đánh bắt trong ngày — cam kết tươi</p>
+        <a href="/Store?categoryId=3" class="btn btn-light btn-sm mt-1">Xem ngay</a></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="promo-banner" style="background:linear-gradient(135deg,#e65100,#bf360c);">
+        <div><h6>🥛 Sữa & Dairy nhập khẩu</h6><p>Chính hãng — giá tốt nhất</p>
+        <a href="/Store?categoryId=4" class="btn btn-light btn-sm mt-1">Xem ngay</a></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="container my-3">
+  <div class="section-header">
+    <div class="section-title">DANH MỤC <span>SẢN PHẨM</span></div>
+  </div>
+  <div class="row g-2">
+    @{
+      int[] cIds  = {1,2,3,4,5,6,7,8};
+      string[] cNm = {"Rau cu tuoi","Trai cay","Thit & Hai san","Sua & Trung","Do dong hop","Ngu coc & Hat","Do uong","Gia vi"};
+      string[] cIc = {"fa-leaf","fa-apple-alt","fa-drumstick-bite","fa-cheese","fa-box","fa-seedling","fa-glass-water","fa-pepper-hot"};
+      string[] cBg = {"#e8f5e9","#fff3e0","#fce4ec","#e3f2fd","#f3e5f5","#f1f8e9","#e0f7fa","#fff8e1"};
+      string[] cCl = {"#43a047","#f57c00","#e91e63","#1976d2","#7b1fa2","#558b2f","#00838f","#f9a825"};
+    }
+    @for(int ci=0;ci<cIds.Length;ci++){
+    <div class="col-3 col-md col-lg">
+      <a href="/Store?categoryId=@cIds[ci]" class="cat-card d-block text-decoration-none">
+        <div class="cat-icon" style="background:@cBg[ci];color:@cCl[ci];"><i class="fa @cIc[ci]"></i></div>
+        <div class="cat-name">@cNm[ci]</div>
+      </a>
+    </div>
+    }
+  </div>
+  </div>
+
+  <!-- Flash Sale -->
+  <div class="container my-3">
+  <div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);">
+    <div class="flash-header">
+      <i class="fa fa-bolt text-warning fa-lg"></i>
+      <span class="flash-title">FLASH SALE</span>
+      <span style="color:rgba(255,255,255,.7);font-size:.8rem;">Kết thúc sau</span>
+      <div class="flash-timer">
+        <div class="time-block" id="fh">00</div><span class="time-sep">:</span>
+        <div class="time-block" id="fm">00</div><span class="time-sep">:</span>
+        <div class="time-block" id="fs">00</div>
+      </div>
+    </div>
+    <div style="background:#fff;padding:12px;">
+    <div class="row g-2">
+    @foreach(var p in Model.Items.Take(6)){
+      var disc = (int)(((p.CostPrice / p.SellPrice) - 1) * -100);
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="product-card">
+          @if(disc > 5){<div class="p-badge">-@disc%</div>}
+          <a href="/Store/ProductDetail/@p.Id">
+            <img src="@(p.ImageUrl??"/images/no-image.png")" class="p-img" onerror="this.src='/images/no-image.png'" alt="@p.Name"/>
+          </a>
+          <div class="p-body">
+            <div class="stars">★★★★☆ <span style="color:#999;font-size:.72rem;">(28)</span></div>
+            <div class="p-name">@p.Name</div>
+            <div>
+              <span class="p-price">@p.SellPrice.ToString("N0") ₫</span>
+              <span class="p-old-price">@p.CostPrice.ToString("N0") ₫</span>
+            </div>
+            <div class="p-sold">Đã bán 120+</div>
+          </div>
+          <button class="btn-add-to-cart" onclick="addToCart(@p.Id)">
+            <i class="fa fa-cart-plus me-1"></i>Thêm vào giỏ
+          </button>
+        </div>
+      </div>
+    }
+    </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- All Products with Sidebar Filter -->
+  <div class="container my-3">
+  <div class="row g-3">
+
+    <!-- Sidebar -->
+    <div class="col-lg-2 d-none d-lg-block">
+      <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.07);position:sticky;top:100px;">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--lz-orange);">
+          <i class="fa fa-filter me-2" style="color:var(--lz-orange);"></i>Lọc sản phẩm
+        </div>
+        <form method="get" action="/Store" id="filterForm">
+          <div class="mb-3">
+            <label style="font-size:.8rem;font-weight:600;color:#555;">Từ khóa</label>
+            <input name="search" value="@ViewBag.Search" class="form-control form-control-sm mt-1" placeholder="Tên sản phẩm..."/>
+          </div>
+          <div class="mb-3">
+            <label style="font-size:.8rem;font-weight:600;color:#555;">Danh mục</label>
+            @for(int ci=0;ci<cIds.Length;ci++){
+              <div class="form-check mt-1">
+                <input class="form-check-input" type="radio" name="categoryId" id="catR@ci" value="@cIds[ci]"
+                  @(ViewBag.CategoryId?.ToString()==cIds[ci].ToString()?"checked":"")
+                  onchange="document.getElementById('filterForm').submit()"/>
+                <label class="form-check-label" style="font-size:.8rem;" for="catR@ci">@cNm[ci]</label>
+              </div>
+            }
+            <div class="form-check mt-1">
+              <input class="form-check-input" type="radio" name="categoryId" id="catAll" value=""
+                @(ViewBag.CategoryId==null?"checked":"")
+                onchange="document.getElementById('filterForm').submit()"/>
+              <label class="form-check-label" style="font-size:.8rem;" for="catAll">Tất cả</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-sm w-100" style="background:var(--lz-orange);color:#fff;border-radius:6px;">
+            <i class="fa fa-filter me-1"></i>Lọc
+          </button>
+          <a href="/Store" class="btn btn-sm btn-outline-secondary w-100 mt-2">Xóa bộ lọc</a>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product grid -->
+    <div class="col-lg-10">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="section-title">
+          @if(!string.IsNullOrEmpty(ViewBag.Search as string)){
+            <span>Kết quả cho <span>"@ViewBag.Search"</span> — @Model.TotalCount sản phẩm</span>
+          } else {
+            <span>TẤT CẢ <span>SẢN PHẨM</span> (@Model.TotalCount)</span>
+          }
+        </div>
+        <div class="d-flex gap-2 d-lg-none">
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+            <i class="fa fa-filter me-1"></i>Lọc
+          </button>
+        </div>
+      </div>
+
+      @if(!Model.Items.Any()){
+        <div class="text-center py-5 bg-white rounded-3">
+          <i class="fa fa-box-open fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">Không tìm thấy sản phẩm nào</h5>
+          <a href="/Store" class="btn btn-sm mt-2" style="background:var(--lz-orange);color:#fff;">Xem tất cả</a>
+        </div>
+      }
+
+      <div class="row g-2">
+      @foreach(var p in Model.Items){
+        var disc2 = (int)(((p.CostPrice / p.SellPrice) - 1) * -100);
+        var stock = p.TotalStock;
+        <div class="col-6 col-md-4 col-xl-3">
+          <div class="product-card h-100">
+            @if(disc2 > 5){<div class="p-badge">-@disc2%</div>}
+            @if(stock == 0){<div class="p-badge" style="background:#999;top:8px;right:8px;left:auto;">Hết hàng</div>}
+            <a href="/Store/ProductDetail/@p.Id">
+              <img src="@(p.ImageUrl??"/images/no-image.png")" class="p-img" onerror="this.src='/images/no-image.png'" alt="@p.Name"/>
+            </a>
+            <div class="p-body flex-grow-1 d-flex flex-column">
+              <div class="stars mb-1">★★★★☆ <span style="color:#999;font-size:.7rem;">(12)</span></div>
+              <a href="/Store/ProductDetail/@p.Id" class="text-decoration-none text-dark">
+                <div class="p-name">@p.Name</div>
+              </a>
+              <div class="mt-auto">
+                <div><span class="p-price">@p.SellPrice.ToString("N0") ₫</span><span class="text-muted" style="font-size:.75rem;"> / @p.Unit</span></div>
+                @if(stock>0 && stock<=p.MinStockLevel){
+                  <div style="font-size:.72rem;color:#f57c00;"><i class="fa fa-fire-flame-curved me-1"></i>Sắp hết</div>
+                }
+              </div>
+            </div>
+            @if(stock > 0){
+              <button class="btn-add-to-cart" onclick="addToCart(@p.Id)">
+                <i class="fa fa-cart-plus me-1"></i>Thêm vào giỏ
+              </button>
+            }
+          </div>
+        </div>
+      }
+      </div>
+
+      @if(Model.TotalPages > 1){
+      <nav class="mt-4 d-flex justify-content-center">
+        <ul class="pagination">
+          <li class="page-item @(Model.Page==1?"disabled":"")">
+            <a class="page-link" href="/Store?page=@(Model.Page-1)&search=@ViewBag.Search&categoryId=@ViewBag.CategoryId">
+              <i class="fa fa-angle-left"></i>
+            </a>
+          </li>
+          @for(int i=Math.Max(1,Model.Page-2);i<=Math.Min(Model.TotalPages,Model.Page+2);i++){
+            <li class="page-item @(i==Model.Page?"active":"")">
+              <a class="page-link" href="/Store?page=@i&search=@ViewBag.Search&categoryId=@ViewBag.CategoryId">@i</a>
+            </li>
+          }
+          <li class="page-item @(Model.Page==Model.TotalPages?"disabled":"")">
+            <a class="page-link" href="/Store?page=@(Model.Page+1)&search=@ViewBag.Search&categoryId=@ViewBag.CategoryId">
+              <i class="fa fa-angle-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      }
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Mobile filter offcanvas -->
+<div class="offcanvas offcanvas-start" id="filterOffcanvas">
+  <div class="offcanvas-header"><h5 class="offcanvas-title">Bộ lọc</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div>
+  <div class="offcanvas-body">
+    <form method="get" action="/Store">
+      <input name="search" value="@ViewBag.Search" class="form-control mb-3" placeholder="Tìm sản phẩm..."/>
+      @for(int ci=0;ci<cIds.Length;ci++){
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="radio" name="categoryId" value="@cIds[ci]"
+            @(ViewBag.CategoryId?.ToString()==cIds[ci].ToString()?"checked":"")/>
+          <label class="form-check-label">@cNm[ci]</label>
+        </div>
+      }
+      <button type="submit" class="btn w-100 mt-3" style="background:var(--lz-orange);color:#fff;">Áp dụng</button>
+    </form>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+// Flash sale countdown
+(function(){
+  const now = new Date();
+  const end = new Date(now);
+  end.setHours(23,59,59,0);
+  function tick(){
+    const diff = Math.max(0, end - new Date());
+    const h = String(Math.floor(diff/3600000)).padStart(2,'0');
+    const m = String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+    const s = String(Math.floor(diff%60000/1000)).padStart(2,'0');
+    document.getElementById('fh').textContent=h;
+    document.getElementById('fm').textContent=m;
+    document.getElementById('fs').textContent=s;
+  }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+}

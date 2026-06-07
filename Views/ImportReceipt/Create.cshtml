@@ -1,0 +1,99 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.ImportReceiptViewModel
+@{ ViewData["Title"] = "Lập phiếu nhập kho"; }
+<div class="card">
+<div class="card-header fw-semibold"><i class="fa fa-file-import me-2"></i>Lập phiếu nhập kho mới</div>
+<div class="card-body">
+<form asp-action="Create" method="post" id="importForm">
+@Html.AntiForgeryToken()
+<div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+<div class="row g-3 mb-4">
+<div class="col-md-6">
+<label class="form-label fw-semibold">Nhà cung cấp <span class="text-danger">*</span></label>
+<select name="SupplierId" class="form-select" required>
+<option value="">-- Chọn nhà cung cấp --</option>
+@foreach(var s in (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Suppliers){
+<option value="@s.Value">@s.Text</option>}
+</select>
+</div>
+<div class="col-md-6"><label class="form-label fw-semibold">Ghi chú</label>
+<input name="Note" class="form-control" placeholder="Ghi chú phiếu nhập..."/></div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h6 class="fw-bold mb-0">Chi tiết sản phẩm nhập</h6>
+<button type="button" class="btn btn-sm btn-success" id="addRow"><i class="fa fa-plus me-1"></i>Thêm dòng</button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered align-middle" id="detailTable">
+<thead class="table-light"><tr>
+<th>Sản phẩm</th><th style="width:80px">SL</th><th style="width:130px">Đơn giá (₫)</th>
+<th style="width:130px">Ngày SX</th><th style="width:130px">Hạn SD</th><th style="width:120px">Mã lô</th><th style="width:40px"></th>
+</tr></thead>
+<tbody id="detailBody">
+<tr class="detail-row">
+<td><input name="Details[0].ProductId" type="hidden" class="product-id"/>
+<input class="form-control form-control-sm product-search" placeholder="Tìm sản phẩm..." autocomplete="off"/></td>
+<td><input name="Details[0].Quantity" class="form-control form-control-sm" type="number" min="1" value="1" required/></td>
+<td><input name="Details[0].UnitPrice" class="form-control form-control-sm" type="number" min="0" step="1000" required/></td>
+<td><input name="Details[0].ManufactureDate" class="form-control form-control-sm" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")"/></td>
+<td><input name="Details[0].ExpiryDate" class="form-control form-control-sm" type="date" value="@DateTime.Today.AddMonths(6).ToString("yyyy-MM-dd")" required/></td>
+<td><input name="Details[0].BatchCode" class="form-control form-control-sm" placeholder="Tự động"/></td>
+<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fa fa-trash"></i></button></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4 d-flex gap-2">
+<button type="submit" class="btn btn-primary"><i class="fa fa-save me-2"></i>Lập phiếu</button>
+<a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+</div>
+</form>
+</div></div>
+@section Scripts {
+<script>
+let rowIdx = 1;
+document.getElementById('addRow').addEventListener('click', () => {
+    const tbody = document.getElementById('detailBody');
+    const newRow = document.querySelector('.detail-row').cloneNode(true);
+    newRow.querySelectorAll('[name]').forEach(el => {
+        el.name = el.name.replace(/\[\d+\]/, '[' + rowIdx + ']');
+        if(el.classList.contains('product-id')) el.value = '';
+        if(el.classList.contains('product-search')) el.value = '';
+    });
+    tbody.appendChild(newRow);
+    initAutocomplete(newRow.querySelector('.product-search'));
+    rowIdx++;
+});
+document.addEventListener('click', e => {
+    if (e.target.closest('.remove-row')) {
+        const rows = document.querySelectorAll('.detail-row');
+        if (rows.length > 1) e.target.closest('tr').remove();
+    }
+});
+function initAutocomplete(input) {
+    let timer;
+    input.addEventListener('input', function() {
+        clearTimeout(timer);
+        if (this.value.length < 1) return;
+        timer = setTimeout(async () => {
+            const res = await fetch('/Product/Autocomplete?term=' + encodeURIComponent(this.value));
+            const data = await res.json();
+            let list = document.getElementById('product-list') || (() => {
+                const d = document.createElement('datalist'); d.id = 'product-list'; document.body.appendChild(d); return d;
+            })();
+            list.innerHTML = data.map(p => `<option value="${p.label}" data-id="${p.id}">`).join('');
+            this.setAttribute('list', 'product-list');
+        }, 300);
+    });
+    input.addEventListener('change', function() {
+        const opts = document.querySelectorAll('#product-list option');
+        const found = [...opts].find(o => o.value === this.value);
+        if (found) {
+            const hiddenId = this.closest('tr').querySelector('.product-id');
+            hiddenId.value = found.dataset.id;
+        }
+    });
+}
+document.querySelectorAll('.product-search').forEach(initAutocomplete);
+</script>
+}

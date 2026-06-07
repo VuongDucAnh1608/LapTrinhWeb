@@ -1,0 +1,61 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.PagedResult<Website_QuanLyKhoHangThucPham.Models.ImportReceipt>
+@{ ViewData["Title"] = "Phiếu nhập kho"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="fw-bold mb-0"><i class="fa fa-file-import me-2 text-primary"></i>Phiếu nhập kho</h4>
+<div class="d-flex gap-2">
+<a asp-action="ExpiringBatches" class="btn btn-warning btn-sm"><i class="fa fa-triangle-exclamation me-1"></i>Sắp hết hạn</a>
+<a asp-action="Create" class="btn btn-primary"><i class="fa fa-plus me-2"></i>Lập phiếu nhập</a>
+</div>
+</div>
+<div class="card mb-3"><div class="card-body py-2">
+<form method="get" class="row g-2 align-items-end">
+<div class="col-md-3"><label class="form-label small fw-semibold">Từ ngày</label><input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control form-control-sm"/></div>
+<div class="col-md-3"><label class="form-label small fw-semibold">Đến ngày</label><input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control form-control-sm"/></div>
+<div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-primary"><i class="fa fa-filter me-1"></i>Lọc</button></div>
+<div class="col-auto"><a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="fa fa-xmark"></i></a></div>
+</form>
+</div></div>
+<div class="card"><div class="card-body p-0">
+<table class="table table-hover mb-0 align-middle">
+<thead class="table-light"><tr><th>Mã phiếu</th><th>Ngày nhập</th><th>Nhà cung cấp</th><th>Số mặt hàng</th><th>Tổng tiền</th><th>Người lập</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
+<tbody>
+@foreach(var r in Model.Items){
+<tr>
+<td class="fw-semibold"><a asp-action="Details" asp-route-id="@r.Id">@r.ReceiptCode</a></td>
+<td>@r.ImportDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+<td>@r.Supplier?.Name</td>
+<td><span class="badge bg-secondary">@r.Details.Count SP</span></td>
+<td class="fw-semibold">@r.TotalAmount.ToString("N0") ₫</td>
+<td>@r.CreatedBy?.FullName</td>
+<td><span class="badge @(r.Status==Website_QuanLyKhoHangThucPham.Models.ReceiptStatus.Confirmed?"bg-success":r.Status==Website_QuanLyKhoHangThucPham.Models.ReceiptStatus.Cancelled?"bg-danger":"bg-secondary")">@r.Status</span></td>
+<td class="text-end">
+<a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-info me-1"><i class="fa fa-eye"></i></a>
+@if(r.Status==Website_QuanLyKhoHangThucPham.Models.ReceiptStatus.Draft){
+<button class="btn btn-sm btn-success btn-confirm me-1" data-id="@r.Id"><i class="fa fa-check"></i> Xác nhận</button>
+<form asp-action="Cancel" asp-route-id="@r.Id" method="post" class="d-inline" onsubmit="return confirm('Hủy phiếu này?')">
+@Html.AntiForgeryToken()<button class="btn btn-sm btn-outline-danger"><i class="fa fa-xmark"></i></button>
+</form>
+}
+</td>
+</tr>
+}
+</tbody>
+</table>
+</div></div>
+@if(Model.TotalPages > 1){
+<nav class="mt-3 d-flex justify-content-center"><ul class="pagination pagination-sm">
+@for(int i=1;i<=Model.TotalPages;i++){<li class="page-item @(i==Model.Page?"active":"")"><a class="page-link" asp-action="Index" asp-route-page="@i">@i</a></li>}
+</ul></nav>
+}
+@section Scripts {
+<script>
+document.querySelectorAll('.btn-confirm').forEach(btn=>{
+btn.addEventListener('click',async function(){
+if(!confirm('Xác nhận nhập kho phiếu này? Tồn kho sẽ được cập nhật.'))return;
+const r=await fetch('/ImportReceipt/Confirm/'+this.dataset.id,{method:'POST',headers:{'RequestVerificationToken':document.querySelector('[name=__RequestVerificationToken]')?.value||''}});
+const d=await r.json();
+if(d.success){location.reload();}else alert('Có lỗi xảy ra.');
+});
+});
+</script>
+}

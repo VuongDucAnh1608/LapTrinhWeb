@@ -1,0 +1,29 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.RegisterViewModel
+@{ ViewData["Title"] = "Tạo tài khoản mới"; }
+<div class="card"><div class="card-header"><h5 class="mb-0"><i class="fa fa-user-plus me-2"></i>Tạo tài khoản mới</h5></div>
+<div class="card-body">
+<form asp-action="Register" method="post" style="max-width:600px;">
+@Html.AntiForgeryToken()
+<div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+<div class="row g-3">
+<div class="col-md-6"><label asp-for="FullName" class="form-label fw-semibold"></label>
+<input asp-for="FullName" class="form-control"/><span asp-validation-for="FullName" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Email" class="form-label fw-semibold"></label>
+<input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+<input asp-for="PhoneNumber" class="form-control"/><span asp-validation-for="PhoneNumber" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Role" class="form-label fw-semibold"></label>
+<select asp-for="Role" class="form-select">
+@foreach(var r in (List<string>)ViewBag.Roles){ <option value="@r">@r</option> }
+</select></div>
+<div class="col-md-6"><label asp-for="Password" class="form-label fw-semibold"></label>
+<input asp-for="Password" class="form-control"/><span asp-validation-for="Password" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
+<input asp-for="ConfirmPassword" class="form-control"/><span asp-validation-for="ConfirmPassword" class="text-danger small"></span></div>
+</div>
+<div class="mt-4 d-flex gap-2">
+<button type="submit" class="btn btn-primary"><i class="fa fa-save me-2"></i>Tạo tài khoản</button>
+<a asp-action="UserList" class="btn btn-outline-secondary">Hủy</a>
+</div>
+</form>
+</div></div>

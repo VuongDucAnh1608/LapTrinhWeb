@@ -1,0 +1,98 @@
+@model Website_QuanLyKhoHangThucPham.Models.StoreOrder
+@{ ViewData["Title"] = "Đặt hàng thành công"; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container my-4" style="max-width:680px;">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden;">
+
+    <!-- Header xanh -->
+    <div style="background:linear-gradient(135deg,#43a047,#1b5e20);padding:36px;text-align:center;color:#fff;">
+      <div style="width:72px;height:72px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fa fa-check fa-2x"></i>
+      </div>
+      <h4 class="fw-bold mb-1">
+        @(Model?.Status == "COD" ? "Đặt hàng thành công!" : "Thanh toán thành công!")
+      </h4>
+      <p style="opacity:.85;margin:0;font-size:.9rem;">
+        @(Model?.Status == "COD" ? "Đơn hàng sẽ được giao đến bạn sớm nhất" : "Cảm ơn bạn đã tin tưởng FreshMart")
+      </p>
+    </div>
+
+    <div class="p-4">
+      <!-- Order code banner -->
+      <div style="background:#f1f8e9;border:1px dashed #66bb6a;border-radius:10px;padding:14px;text-align:center;margin-bottom:20px;">
+        <div style="font-size:.78rem;color:#558b2f;margin-bottom:4px;">MÃ ĐƠN HÀNG</div>
+        <div style="font-size:1.4rem;font-weight:800;color:#2e7d32;letter-spacing:2px;">@Model?.OrderCode</div>
+        <div style="font-size:.75rem;color:#888;margin-top:4px;">Lưu mã này để tra cứu đơn hàng</div>
+      </div>
+
+      <!-- Order details -->
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <div style="background:#fafafa;border-radius:8px;padding:12px;">
+            <div style="font-size:.72rem;color:#888;margin-bottom:4px;"><i class="fa fa-user me-1"></i>KHÁCH HÀNG</div>
+            <div style="font-weight:600;font-size:.88rem;">@Model?.CustomerName</div>
+            <div style="font-size:.8rem;color:#666;">@Model?.CustomerPhone</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div style="background:#fafafa;border-radius:8px;padding:12px;">
+            <div style="font-size:.72rem;color:#888;margin-bottom:4px;"><i class="fa fa-credit-card me-1"></i>THANH TOÁN</div>
+            <div style="font-weight:600;font-size:.88rem;">
+              @(Model?.PaymentMethod == "COD" ? "Tiền mặt khi nhận" : "Chuyển khoản QR")
+            </div>
+            <div style="font-size:.8rem;color:#666;">
+              <span class="badge @(Model?.Status=="Paid"?"bg-success":Model?.Status=="COD"?"bg-primary":"bg-warning text-dark")">
+                @(Model?.Status == "Paid" ? "Đã thanh toán" : Model?.Status == "COD" ? "Thu khi nhận hàng" : "Chờ xác nhận")
+              </span>
+            </div>
+          </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model?.DeliveryAddress)){
+        <div class="col-12">
+          <div style="background:#fafafa;border-radius:8px;padding:12px;">
+            <div style="font-size:.72rem;color:#888;margin-bottom:4px;"><i class="fa fa-location-dot me-1"></i>ĐỊA CHỈ GIAO HÀNG</div>
+            <div style="font-weight:600;font-size:.88rem;">@Model.DeliveryAddress</div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Items -->
+      @if(Model?.Items?.Any() == true){
+      <div style="border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+        <div style="background:#fafafa;padding:10px 16px;font-size:.78rem;font-weight:700;color:#555;">CHI TIẾT ĐƠN HÀNG</div>
+        @foreach(var item in Model.Items){
+        <div style="padding:12px 16px;border-top:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;">
+          <img src="@(item.Product?.ImageUrl??"/images/no-image.png")" onerror="this.src='/images/no-image.png'"
+               style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;"/>
+          <div style="flex:1;">
+            <div style="font-size:.85rem;font-weight:600;">@item.ProductName</div>
+            <div style="font-size:.75rem;color:#888;">x@item.Quantity</div>
+          </div>
+          <div style="color:#e53935;font-weight:700;font-size:.88rem;">@item.SubTotal.ToString("N0") ₫</div>
+        </div>
+        }
+        <div style="padding:12px 16px;border-top:2px solid #f0f0f0;display:flex;justify-content:space-between;background:#fff8f5;">
+          <span style="font-weight:700;">Tổng cộng</span>
+          <span style="font-size:1.1rem;font-weight:800;color:#e53935;">@Model.TotalAmount.ToString("N0") ₫</span>
+        </div>
+      </div>
+      }
+
+      <!-- CTA buttons -->
+      <div class="d-flex gap-2">
+        <a href="/Store" class="btn flex-fill fw-semibold py-2"
+           style="background:linear-gradient(135deg,#f57224,#e65100);color:#fff;border-radius:8px;">
+          <i class="fa fa-store me-2"></i>Tiếp tục mua sắm
+        </a>
+        <a href="/Store/Cart" class="btn flex-fill btn-outline-secondary py-2" style="border-radius:8px;">
+          <i class="fa fa-cart-shopping me-2"></i>Xem giỏ hàng
+        </a>
+      </div>
+
+      <div style="text-align:center;margin-top:16px;font-size:.75rem;color:#aaa;">
+        <i class="fa fa-envelope me-1"></i>Xác nhận đơn hàng đã được gửi đến <strong>@Model?.CustomerEmail</strong>
+      </div>
+    </div>
+  </div>
+</div>

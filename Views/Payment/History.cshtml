@@ -1,0 +1,130 @@
+@model IEnumerable<Website_QuanLyKhoHangThucPham.Models.StoreOrder>
+@{ ViewData["Title"] = "Đơn hàng khách mua"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="fw-bold mb-0">Đơn hàng từ cửa hàng</h5>
+    <small class="text-muted">Tổng: @ViewBag.TotalCount đơn</small>
+  </div>
+  <a href="/Store" target="_blank" class="btn btn-sc-primary btn-sm">
+    <i class="fa fa-store me-1"></i>Xem cửa hàng
+  </a>
+</div>
+
+<!-- Filter bar -->
+<div class="sc-card p-3 mb-3">
+  <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+    @{
+      var sf = ViewBag.StatusFilter as string ?? "";
+    }
+    <select name="status" class="form-select form-select-sm" style="width:160px;"
+            onchange="this.form.submit()">
+      <option value="">Tất cả trạng thái</option>
+      @if(sf=="Pending"){<option value="Pending" selected>Chờ thanh toán</option>}
+      else{<option value="Pending">Chờ thanh toán</option>}
+      @if(sf=="Paid"){<option value="Paid" selected>Đã thanh toán</option>}
+      else{<option value="Paid">Đã thanh toán</option>}
+      @if(sf=="COD"){<option value="COD" selected>Thu khi nhận</option>}
+      else{<option value="COD">Thu khi nhận</option>}
+      @if(sf=="Cancelled"){<option value="Cancelled" selected>Đã hủy</option>}
+      else{<option value="Cancelled">Đã hủy</option>}
+    </select>
+    <button type="submit" class="btn btn-sc-outline btn-sm"><i class="fa fa-filter me-1"></i>Lọc</button>
+    <a href="/Payment/History" class="btn btn-sc-outline btn-sm">Xóa lọc</a>
+
+    <!-- Revenue summary -->
+    <div class="ms-auto d-flex gap-3" style="font-size:.82rem;">
+      @{ var orders = Model.ToList(); }
+      <span><i class="fa fa-check-circle text-success me-1"></i>
+        Đã TT: <strong>@orders.Where(o=>o.Status=="Paid").Sum(o=>o.TotalAmount).ToString("N0") ₫</strong>
+      </span>
+      <span><i class="fa fa-clock text-warning me-1"></i>
+        COD: <strong>@orders.Where(o=>o.Status=="COD").Sum(o=>o.TotalAmount).ToString("N0") ₫</strong>
+      </span>
+    </div>
+  </form>
+</div>
+
+<div class="sc-card">
+  <table class="table sc-table mb-0">
+    <thead>
+      <tr>
+        <th>Mã đơn</th><th>Ngày đặt</th><th>Khách hàng</th>
+        <th>SĐT</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th class="text-end">Chi tiết</th>
+      </tr>
+    </thead>
+    <tbody>
+    @if(!Model.Any()){
+      <tr><td colspan="8" class="text-center py-4 text-muted">
+        <i class="fa fa-inbox fa-2x mb-2 d-block"></i>Chưa có đơn hàng nào
+      </td></tr>
+    }
+    @foreach(var o in Model){
+    <tr>
+      <td class="fw-semibold" style="color:var(--sc-orange);">@o.OrderCode</td>
+      <td>@o.CreatedAt.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+      <td>@o.CustomerName</td>
+      <td>@o.CustomerPhone</td>
+      <td class="fw-semibold">@o.TotalAmount.ToString("N0") ₫</td>
+      <td>
+        <span class="badge @(o.PaymentMethod=="SePay"?"bg-success":"bg-primary")">
+          @(o.PaymentMethod == "SePay" ? "QR" : "COD")
+        </span>
+      </td>
+      <td>
+        <span class="badge @(o.Status=="Paid"?"bg-success":o.Status=="COD"?"bg-primary":o.Status=="Cancelled"?"bg-danger":"bg-warning text-dark")">
+          @(o.Status switch { "Paid"=>"Đã TT","COD"=>"Thu khi nhận","Cancelled"=>"Đã hủy",_=>"Chờ TT" })
+        </span>
+      </td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-sc-outline" onclick="showDetail('@o.OrderCode','@o.CustomerName','@o.CustomerEmail','@o.CustomerPhone','@o.DeliveryAddress','@o.Note','@o.TotalAmount.ToString("N0")')">
+          <i class="fa fa-eye"></i>
+        </button>
+      </td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>
+
+@{ int total=(int)ViewBag.TotalCount, ps=(int)ViewBag.PageSize, pg=(int)ViewBag.Page, totalPg=(int)Math.Ceiling((double)total/ps); }
+@if(totalPg > 1){
+<nav class="mt-3 d-flex justify-content-center">
+  <ul class="pagination pagination-sm">
+    @for(int i=1;i<=totalPg;i++){
+      <li class="page-item @(i==pg?"active":"")">
+        <a class="page-link" href="/Payment/History?page=@i&status=@ViewBag.StatusFilter">@i</a>
+      </li>
+    }
+  </ul>
+</nav>
+}
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="border-bottom:1px solid #f0f0f0;">
+      <h6 class="modal-title fw-bold"><i class="fa fa-receipt me-2" style="color:var(--sc-orange);"></i>Chi tiết đơn hàng</h6>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div></div>
+</div>
+
+@section Scripts {
+<script>
+function showDetail(code, name, email, phone, addr, note, total) {
+  document.getElementById('modalBody').innerHTML = `
+    <table class="table table-sm">
+      <tr><td class="text-muted" style="width:36%">Mã đơn</td><td class="fw-bold" style="color:var(--sc-orange)">${code}</td></tr>
+      <tr><td class="text-muted">Khách hàng</td><td class="fw-semibold">${name}</td></tr>
+      <tr><td class="text-muted">Email</td><td>${email||'—'}</td></tr>
+      <tr><td class="text-muted">SĐT</td><td>${phone||'—'}</td></tr>
+      <tr><td class="text-muted">Địa chỉ</td><td>${addr||'—'}</td></tr>
+      <tr><td class="text-muted">Ghi chú</td><td>${note||'—'}</td></tr>
+      <tr><td class="text-muted">Tổng tiền</td><td class="fw-bold text-danger fs-6">${total} ₫</td></tr>
+    </table>`;
+  new bootstrap.Modal(document.getElementById('detailModal')).show();
+}
+</script>
+}

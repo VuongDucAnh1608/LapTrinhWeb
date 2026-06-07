@@ -1,0 +1,11 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.ErrorViewModel
+@{ ViewData["Title"] = "Lỗi hệ thống"; }
+<div class="text-center py-5">
+    <i class="fa fa-circle-xmark fa-4x text-danger mb-3"></i>
+    <h2 class="fw-bold">Đã xảy ra lỗi</h2>
+    @if (Model.ShowRequestId)
+    {
+        <p class="text-muted small">Request ID: <code>@Model.RequestId</code></p>
+    }
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2">Về trang chủ</a>
+</div>

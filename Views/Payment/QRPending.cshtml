@@ -1,0 +1,180 @@
+@{ Layout = null; ViewData["Title"] = "Quet ma QR de thanh toan"; }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>@ViewData["Title"]</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+body{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);min-height:100vh;font-family:'Segoe UI',sans-serif;}
+.qr-card{max-width:520px;margin:30px auto;border:none;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.1);}
+.qr-img{width:240px;height:240px;border:8px solid #fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.12);}
+.pulse{animation:pulse 2s infinite;}
+@@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-pending{background:#fff8e1;border:2px solid #ffc107;border-radius:12px;padding:14px;}
+.status-paid{background:#e8f5e9;border:2px solid #43a047;border-radius:12px;padding:14px;display:none;}
+.step-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0;}
+.step-num{background:#2e7d32;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;}
+.countdown{font-size:1.5rem;font-weight:700;color:#e53935;}
+.bank-info{background:#f8f9fa;border-radius:10px;padding:14px;}
+.copy-btn{cursor:pointer;color:#2e7d32;}
+.copy-btn:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-dark py-2 px-4" style="background:#1b5e20;">
+  <a class="navbar-brand fw-bold" href="/Store"><i class="fa fa-leaf me-2"></i>FreshMart</a>
+</nav>
+
+<div class="qr-card card mx-auto px-2">
+<div class="card-body p-4">
+
+  <div class="text-center mb-3">
+    <div class="badge bg-warning text-dark fs-6 px-3 py-2 mb-2">
+      <i class="fa fa-clock me-2 pulse"></i>Cho thanh toan...
+    </div>
+    <h5 class="fw-bold">Quet ma QR de thanh toan</h5>
+    <p class="text-muted small mb-0">He thong tu dong xac nhan sau khi nhan chuyen khoan</p>
+  </div>
+
+  <div class="text-center mb-3">
+    <img id="qrImg" src="@ViewBag.QrUrl" class="qr-img" alt="QR Code thanh toan"
+         onerror="this.src='/images/no-image.png'"/>
+    <div class="mt-2">
+      <small class="text-muted">QR nay tich hop san noi dung chuyen khoan</small>
+    </div>
+  </div>
+
+  <div class="bank-info mb-3">
+    <div class="row g-2 small">
+      <div class="col-6">
+        <div class="text-muted">Ma don hang</div>
+        <div class="fw-bold text-success" id="orderCodeDisplay">@ViewBag.OrderCode</div>
+      </div>
+      <div class="col-6">
+        <div class="text-muted">So tien</div>
+        <div class="fw-bold text-danger">@(((decimal)ViewBag.Amount).ToString("N0")) ₫</div>
+      </div>
+      <div class="col-12">
+        <div class="text-muted">Noi dung chuyen khoan (bat buoc)</div>
+        <div class="d-flex align-items-center gap-2">
+          <code class="fw-bold text-primary" id="transferContent">@ViewBag.Content</code>
+          <span class="copy-btn" onclick="copyContent()" title="Sao chep">
+            <i class="fa fa-copy"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-pending mb-3" id="statusPending">
+    <div class="d-flex align-items-center gap-2">
+      <div class="pulse"><i class="fa fa-spinner fa-spin text-warning fa-lg"></i></div>
+      <div>
+        <div class="fw-semibold small">Dang cho xac nhan thanh toan...</div>
+        <div class="text-muted" style="font-size:.78rem">He thong kiem tra moi 5 giay. Con lai: <span id="countdown" class="countdown">15:00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-paid mb-3" id="statusPaid">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa fa-check-circle text-success fa-2x"></i>
+      <div>
+        <div class="fw-bold text-success">Da xac nhan thanh toan!</div>
+        <div class="text-muted small">Dang chuyen den trang ket qua...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <p class="small fw-semibold text-muted mb-2"><i class="fa fa-list-ol me-1"></i>Huong dan thanh toan:</p>
+    <div class="step-item"><div class="step-num">1</div><small>Mo app ngan hang hoac vi dien tu tren dien thoai</small></div>
+    <div class="step-item"><div class="step-num">2</div><small>Chon <strong>Quet QR / Chuyen tien</strong> va quet ma QR tren man hinh</small></div>
+    <div class="step-item"><div class="step-num">3</div><small>Kiem tra dung so tien va noi dung <strong>"@ViewBag.Content"</strong></small></div>
+    <div class="step-item"><div class="step-num">4</div><small>Xac nhan chuyen khoan — trang se tu dong cap nhat</small></div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="/Store" class="btn btn-outline-secondary btn-sm flex-fill">
+      <i class="fa fa-arrow-left me-1"></i>Ve cua hang
+    </a>
+    <button onclick="checkNow()" class="btn btn-success btn-sm flex-fill" id="checkBtn">
+      <i class="fa fa-rotate me-1"></i>Kiem tra ngay
+    </button>
+  </div>
+
+  <p class="text-muted text-center mt-3" style="font-size:.75rem;">
+    <i class="fa fa-shield-halved me-1 text-success"></i>
+    Thanh toan duoc bao mat boi SePay + VietQR
+  </p>
+
+</div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const ORDER_CODE = '@ViewBag.OrderCode';
+let totalSeconds = 15 * 60; // 15 phut timeout
+let polling;
+
+// Polling moi 5 giay
+function startPolling() {
+    polling = setInterval(checkStatus, 5000);
+}
+
+async function checkStatus() {
+    try {
+        const res  = await fetch(`/Payment/CheckStatus?orderCode=${ORDER_CODE}`);
+        const data = await res.json();
+        if (data.status === 'Paid') {
+            clearInterval(polling);
+            document.getElementById('statusPending').style.display = 'none';
+            document.getElementById('statusPaid').style.display = 'block';
+            setTimeout(() => { window.location.href = `/Payment/Success?orderCode=${ORDER_CODE}`; }, 2000);
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function checkNow() {
+    document.getElementById('checkBtn').disabled = true;
+    document.getElementById('checkBtn').innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Dang kiem tra...';
+    await checkStatus();
+    setTimeout(() => {
+        document.getElementById('checkBtn').disabled = false;
+        document.getElementById('checkBtn').innerHTML = '<i class="fa fa-rotate me-1"></i>Kiem tra ngay';
+    }, 2000);
+}
+
+function copyContent() {
+    navigator.clipboard.writeText('@ViewBag.Content').then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.innerHTML = '<i class="fa fa-check text-success"></i>';
+        setTimeout(() => { btn.innerHTML = '<i class="fa fa-copy"></i>'; }, 2000);
+    });
+}
+
+// Dem nguoc 15 phut
+function updateCountdown() {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    document.getElementById('countdown').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if (totalSeconds <= 0) {
+        clearInterval(polling);
+        document.getElementById('statusPending').innerHTML = `
+            <div class="d-flex align-items-center gap-2 text-danger">
+                <i class="fa fa-clock fa-lg"></i>
+                <div><div class="fw-bold">Het thoi gian cho</div>
+                <div class="small">Vui long thu lai hoac lien he ho tro.</div></div>
+            </div>`;
+    }
+    totalSeconds--;
+}
+
+startPolling();
+setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>

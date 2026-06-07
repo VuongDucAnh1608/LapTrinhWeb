@@ -1,0 +1,140 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.CartViewModel
+@{ ViewData["Title"] = "Giỏ hàng"; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container my-3">
+<div class="row g-3">
+
+  <!-- Cart items -->
+  <div class="col-lg-8">
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
+        <h5 class="fw-bold mb-0"><i class="fa fa-cart-shopping me-2" style="color:var(--lz-orange);"></i>Giỏ hàng của bạn</h5>
+        <span style="color:#888;font-size:.85rem;">@Model.TotalItems sản phẩm</span>
+      </div>
+
+      @if(!Model.Items.Any()){
+        <div class="text-center py-5">
+          <i class="fa fa-cart-shopping fa-4x text-muted mb-3"></i>
+          <h5 class="text-muted">Giỏ hàng đang trống</h5>
+          <p class="text-muted small">Thêm sản phẩm vào giỏ để tiến hành đặt hàng</p>
+          <a href="/Store" class="btn fw-semibold px-4" style="background:var(--lz-orange);color:#fff;border-radius:8px;">
+            <i class="fa fa-store me-2"></i>Tiếp tục mua sắm
+          </a>
+        </div>
+      } else {
+        <!-- Header row -->
+        <div class="d-none d-md-flex align-items-center px-4 py-2" style="background:#fafafa;font-size:.8rem;color:#888;font-weight:600;">
+          <div style="flex:1;">SẢN PHẨM</div>
+          <div style="width:110px;text-align:center;">ĐƠN GIÁ</div>
+          <div style="width:130px;text-align:center;">SỐ LƯỢNG</div>
+          <div style="width:110px;text-align:right;">THÀNH TIỀN</div>
+          <div style="width:40px;"></div>
+        </div>
+
+        @foreach(var item in Model.Items){
+        <div class="d-flex align-items-center gap-3 p-3 border-bottom" style="border-color:#f5f5f5!important;">
+          <img src="@(item.ImageUrl??"/images/no-image.png")" onerror="this.src='/images/no-image.png'"
+               style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #eee;flex-shrink:0;"
+               alt="@item.ProductName"/>
+          <div style="flex:1;min-width:0;">
+            <div class="fw-semibold text-truncate" style="font-size:.9rem;">@item.ProductName</div>
+            <div style="color:#888;font-size:.78rem;">@item.Unit</div>
+            <div class="d-md-none" style="color:var(--lz-red);font-weight:700;">@item.SellPrice.ToString("N0") ₫</div>
+          </div>
+          <div class="d-none d-md-block" style="width:110px;text-align:center;color:#555;font-size:.88rem;">
+            @item.SellPrice.ToString("N0") ₫
+          </div>
+          <div style="width:130px;text-align:center;">
+            <form action="/Store/UpdateCart" method="post" class="d-inline-flex align-items-center gap-1">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="productId" value="@item.ProductId"/>
+              <button type="submit" name="quantity" value="@(item.Quantity-1)"
+                style="width:28px;height:28px;border:1px solid #ddd;border-radius:50%;background:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+              <span class="fw-bold px-2" style="font-size:.95rem;min-width:24px;text-align:center;">@item.Quantity</span>
+              <button type="submit" name="quantity" value="@(item.Quantity+1)"
+                style="width:28px;height:28px;border:1px solid #ddd;border-radius:50%;background:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+            </form>
+          </div>
+          <div class="d-none d-md-block" style="width:110px;text-align:right;color:var(--lz-red);font-weight:700;font-size:.95rem;">
+            @item.SubTotal.ToString("N0") ₫
+          </div>
+          <div style="width:40px;text-align:center;">
+            <form action="/Store/RemoveFromCart" method="post">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="productId" value="@item.ProductId"/>
+              <button style="background:none;border:none;color:#ccc;font-size:1.1rem;cursor:pointer;" title="Xóa">
+                <i class="fa fa-trash-can"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        }
+
+        <div class="p-3 text-end">
+          <a href="/Store" style="color:var(--lz-orange);font-size:.85rem;text-decoration:none;">
+            <i class="fa fa-arrow-left me-1"></i>Tiếp tục mua sắm
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Voucher -->
+    @if(Model.Items.Any()){
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);padding:16px 20px;margin-top:12px;">
+      <div class="d-flex gap-2">
+        <i class="fa fa-ticket" style="color:var(--lz-orange);margin-top:3px;"></i>
+        <input type="text" class="form-control form-control-sm" placeholder="Nhập mã giảm giá / voucher" style="max-width:260px;"/>
+        <button class="btn btn-sm px-4" style="background:var(--lz-orange);color:#fff;border-radius:6px;">Áp dụng</button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Order summary -->
+  @if(Model.Items.Any()){
+  <div class="col-lg-4">
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);padding:20px;position:sticky;top:100px;">
+      <h6 class="fw-bold mb-3" style="border-bottom:1px solid #f0f0f0;padding-bottom:10px;">
+        <i class="fa fa-receipt me-2" style="color:var(--lz-orange);"></i>Tóm tắt đơn hàng
+      </h6>
+      <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;">
+        <span style="color:#777;">Tạm tính (@Model.TotalItems sản phẩm)</span>
+        <span>@Model.Total.ToString("N0") ₫</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;">
+        <span style="color:#777;">Phí vận chuyển</span>
+        @if(Model.Total >= 200000){
+          <span class="text-success fw-semibold">Miễn phí</span>
+        } else {
+          <span>30.000 ₫</span>
+        }
+      </div>
+      @if(Model.Total < 200000){
+        <div style="background:#fff8f5;border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--lz-orange);margin-bottom:12px;">
+          <i class="fa fa-info-circle me-1"></i>Mua thêm <strong>@((200000 - Model.Total).ToString("N0")) ₫</strong> để được miễn phí vận chuyển
+        </div>
+      }
+      <div style="border-top:1px dashed #eee;padding-top:12px;margin-top:8px;margin-bottom:16px;">
+        <div class="d-flex justify-content-between">
+          <span class="fw-bold">Tổng cộng</span>
+          <span class="fw-bold fs-5" style="color:var(--lz-red);">
+            @((Model.Total + (Model.Total < 200000 ? 30000 : 0)).ToString("N0")) ₫
+          </span>
+        </div>
+        @if(Model.Total >= 200000){
+          <div style="font-size:.75rem;color:#43a047;text-align:right;"><i class="fa fa-check me-1"></i>Đã được miễn phí vận chuyển</div>
+        }
+      </div>
+      <a href="/Store/Checkout"
+         class="btn w-100 fw-bold py-2"
+         style="background:var(--lz-red);color:#fff;border-radius:8px;font-size:.95rem;">
+        <i class="fa fa-lock me-2"></i>Đặt hàng ngay
+      </a>
+      <div class="text-center mt-3" style="font-size:.75rem;color:#aaa;">
+        <i class="fa fa-shield-halved me-1 text-success"></i>Bảo mật 256-bit SSL
+      </div>
+    </div>
+  </div>
+  }
+</div>
+</div>

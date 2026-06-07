@@ -1,0 +1,23 @@
+@model Website_QuanLyKhoHangThucPham.ViewModels.PagedResult<Website_QuanLyKhoHangThucPham.Models.ExportRequest>
+@{ ViewData["Title"] = "Yêu cầu của tôi"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="fw-bold mb-0"><i class="fa fa-list me-2 text-primary"></i>Yêu cầu xuất kho của tôi</h4>
+<a asp-action="Create" class="btn btn-primary"><i class="fa fa-plus me-2"></i>Tạo yêu cầu mới</a>
+</div>
+<div class="card"><div class="card-body p-0">
+<table class="table table-hover mb-0">
+<thead class="table-light"><tr><th>Mã YC</th><th>Ngày tạo</th><th>Số SP</th><th>Trạng thái</th><th>Ngày xử lý</th><th class="text-end">Chi tiết</th></tr></thead>
+<tbody>
+@foreach(var r in Model.Items){
+<tr>
+<td class="fw-semibold"><a asp-action="Details" asp-route-id="@r.Id">@r.RequestCode</a></td>
+<td>@r.RequestDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+<td><span class="badge bg-secondary">@r.Details.Count SP</span></td>
+<td><span class="badge @(r.Status==Website_QuanLyKhoHangThucPham.Models.ExportStatus.Completed?"bg-success":r.Status==Website_QuanLyKhoHangThucPham.Models.ExportStatus.Rejected?"bg-danger":r.Status==Website_QuanLyKhoHangThucPham.Models.ExportStatus.Pending?"bg-warning text-dark":"bg-secondary")">@r.Status</span></td>
+<td>@r.ProcessedAt?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+<td class="text-end"><a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-info"><i class="fa fa-eye"></i></a></td>
+</tr>
+}
+</tbody>
+</table>
+</div></div>

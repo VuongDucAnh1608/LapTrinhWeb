@@ -1,0 +1,33 @@
+@model IEnumerable<Website_QuanLyKhoHangThucPham.Models.Category>
+@{ ViewData["Title"] = "Danh mục sản phẩm"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h5 class="fw-bold mb-0">Danh mục sản phẩm</h5>
+  <small class="text-muted">@Model.Count() danh mục</small></div>
+  <a asp-action="Create" class="btn btn-sc-primary btn-sm"><i class="fa fa-plus me-1"></i>Thêm danh mục</a>
+</div>
+<div class="sc-card">
+  <table class="table sc-table mb-0">
+    <thead><tr><th>#</th><th>Tên danh mục</th><th>Mô tả</th><th>Số SP</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
+    <tbody>
+    @{ int stt = 1; }
+    @foreach(var c in Model){
+    <tr>
+      <td class="text-muted">@stt++</td>
+      <td class="fw-semibold">@c.Name</td>
+      <td class="text-muted">@c.Description</td>
+      <td><span class="badge bg-light text-dark border">@c.Products.Count SP</span></td>
+      <td><span class="badge @(c.IsActive?"bg-success":"bg-secondary")">@(c.IsActive?"Hoạt động":"Tắt")</span></td>
+      <td class="text-end">
+        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-sc-outline me-1"><i class="fa fa-pen"></i></a>
+        <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline"
+              onsubmit="return confirm('Xóa danh mục này?')">
+          @Html.AntiForgeryToken()
+          <button class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button>
+        </form>
+      </td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>

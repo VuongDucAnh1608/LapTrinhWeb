@@ -1,0 +1,39 @@
+@model Website_QuanLyKhoHangThucPham.Models.StoreOrder
+@{ ViewData["Title"] = "Thanh toán thất bại"; Layout = "~/Views/Shared/_CustomerLayout.cshtml"; }
+
+<div class="container my-4" style="max-width:520px;">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#e53935,#b71c1c);padding:36px;text-align:center;color:#fff;">
+      <div style="width:72px;height:72px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fa fa-xmark fa-2x"></i>
+      </div>
+      <h4 class="fw-bold mb-1">Thanh toán thất bại</h4>
+      <p style="opacity:.85;margin:0;font-size:.9rem;">Đơn hàng chưa được xác nhận thanh toán</p>
+    </div>
+    <div class="p-4 text-center">
+      <div style="background:#fce4ec;border-radius:10px;padding:16px;margin-bottom:20px;">
+        <div style="font-size:.78rem;color:#c62828;margin-bottom:4px;">MÃ ĐƠN HÀNG</div>
+        <div style="font-size:1.2rem;font-weight:800;color:#b71c1c;">@Model?.OrderCode</div>
+        <div style="font-size:.78rem;color:#888;margin-top:6px;">
+          Số tiền: <strong style="color:#e53935;">@Model?.TotalAmount.ToString("N0") ₫</strong>
+        </div>
+      </div>
+      <p style="font-size:.85rem;color:#666;margin-bottom:20px;">
+        Giao dịch của bạn không thành công hoặc đã hết thời gian chờ.<br/>
+        Vui lòng thử lại hoặc chọn phương thức thanh toán khác.
+      </p>
+      <div class="d-flex gap-2 flex-column">
+        <a href="/Store/Checkout" class="btn fw-semibold py-2"
+           style="background:linear-gradient(135deg,#e53935,#c62828);color:#fff;border-radius:8px;">
+          <i class="fa fa-rotate-right me-2"></i>Thử lại thanh toán
+        </a>
+        <a href="/Store" class="btn btn-outline-secondary py-2" style="border-radius:8px;">
+          <i class="fa fa-store me-2"></i>Về trang cửa hàng
+        </a>
+      </div>
+      <p style="margin-top:16px;font-size:.75rem;color:#aaa;">
+        <i class="fa fa-headset me-1"></i>Hỗ trợ: vuongducanh1608@gmail.com
+      </p>
+    </div>
+  </div>
+</div>
